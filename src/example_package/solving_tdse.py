@@ -48,3 +48,26 @@ for t in t_array:
     psi = U.dot(psi)
     psi[0] = psi[-1] = 0
     psi_list.append(np.abs(psi))
+    
+fig, ax = plt.subplots()
+
+ax.set_xlabel("x [arb units]")
+ax.set_ylabel("$|\Psi(x, t)|$", color="C0")
+
+ax_twin = ax.twinx()
+ax_twin.plot(x_array, v_x, color="C1")
+ax_twin.set_ylabel("V(x) [arb units]", color="C1")
+
+line, = ax.plot([], [], color="C0", lw=2)
+ax.grid()
+xdata, ydata = [], []
+
+def run(psi):
+    line.set_data(x_array, np.abs(psi)**2)
+    return line,
+
+ax.set_xlim(x_array[0], x_array[-1])
+ax.set_ylim(0, 1)
+
+ani = animation.FuncAnimation(fig, run, psi_list, interval=10)
+ani.save("particle_in_a_well.gif", fps=120, dpi=300)
