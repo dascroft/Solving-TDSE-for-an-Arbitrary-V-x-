@@ -4,6 +4,7 @@ from findiff import FinDiff
 from scipy.sparse.linalg import inv
 from scipy.sparse import eye, diags
 import matplotlib.animation as animation
+from scipy import signal
 
 plt.rcParams["axes.labelsize"] = 16
 
@@ -33,7 +34,13 @@ def func4(x, k, p):
 # Calculate grid, potential, and initial wave function
 x_array = np.linspace(xmin, xmax, Nx)
 t_array = np.linspace(tmin, tmax, Nt)
-v_x = k * x_array ** 2
+v_x = signal.square(2 * np.pi/4 * x_array) 
+'''
+paramaters:
+Parameter in place of 2: dictates number of square waves
+np.pi gives it the correct period
+Has to be multiplied by x_array to be the same dimension as the wavefunction
+'''
 psi = np.exp(-(x_array+2)**2)
 
 # Calculate finite difference elements
