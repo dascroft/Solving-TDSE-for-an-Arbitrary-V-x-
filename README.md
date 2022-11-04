@@ -1,6 +1,6 @@
 # Template repository for PH3010 Advanced Python
 Solving the TDSE for a Arbitrary Potential:
-```
+
 
 * `.gitignore` contains files that should be ignored by git
 * `LICENSE` the project license telling users who install your package the terms under which they can use your package
