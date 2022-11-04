@@ -1,30 +1,6 @@
 # Template repository for PH3010 Advanced Python
-
-This is a template repository demonstrating how to package a python project. The directory is structured as follows:
+Solving the TDSE for a Arbitrary Potential:
 ```
-template_project_PH3010_advanced_python/
-├── .gitignore
-├── LICENSE
-├── README.md
-├── pyproject.toml
-├── requirements.txt
-├── setup.cfg
-├── .github/
-│   └── workflows/
-│              └── python_test.yml
-├── docs/
-│   └── ../
-│   └── workflows/
-├── src/
-│   └── example_package/
-│       ├── __init__.py
-│       ├── command_line_interface.py
-│       └── example.py
-└── tests/
-        └── test_example.py
-```
-
-Let's look at each element individually
 
 * `.gitignore` contains files that should be ignored by git
 * `LICENSE` the project license telling users who install your package the terms under which they can use your package
