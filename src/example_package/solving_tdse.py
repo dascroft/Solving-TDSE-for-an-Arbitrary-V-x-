@@ -64,6 +64,7 @@ class TDSE(object):
             self.psi = U.dot(self.psi)
             self.psi[0] = self.psi[-1] = 0
             self.psi_list.append(np.abs(self.psi))
+        return self.psi_list
 
     def run(self, psi):
         line.set_data(self.x_array, np.abs(psi)**2)
@@ -83,12 +84,11 @@ class TDSE(object):
 
         ax.set_xlim(x_array[0], x_array[-1])
         ax.set_ylim(0, 1)
-        ani = animation.FuncAnimation(fig, self.run, self.psi_list, interval=10)
+        ani = animation.FuncAnimation(fig, self.run, TDSE.solve(x_array, t_array), interval=10)
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
 
 
 TDSE = TDSE()
-TDSE.solve(x_array, t_array)
 TDSE.animate(x_array)
 
 
