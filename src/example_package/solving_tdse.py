@@ -7,7 +7,7 @@ import matplotlib.animation as animation
 
 
 class TDSE(object):
-    def __init__(self):
+    def __init__(self, **kwargs):
         
         self.Nx = 500
         self.xmin = -5
@@ -53,6 +53,15 @@ class TDSE(object):
     def run(self, psi):
         self.line.set_data(self.x_array, np.abs(psi)**2)
         return self.line,
+    
+    def plot(self):
+        psi_mag_squared = np.abs(TDSE.solve(self.x_array, self.t_array))**2
+        fig, ax = plt.subplots(figsize=(10, 8))
+        c = ax.pcolor(self.x_array, self.t_array, psi_mag_squared, shading="auto")
+        ax.set(xlabel="x [arb units]", ylabel="time [arb units]")
+        cbar = fig.colorbar(c, ax=ax)
+        cbar.set_label("$|\Psi(x, t)|^2$")
+        plt.show()
         
     def animate(self):
         fig, ax = plt.subplots()
@@ -78,8 +87,8 @@ class TDSE(object):
 
 
 TDSE = TDSE()
-TDSE.animate()
-
+#TDSE.animate()
+TDSE.plot()
 
 
     
