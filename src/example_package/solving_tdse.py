@@ -91,4 +91,3 @@ TDSE = TDSE()
 TDSE.plot()
 
 
-    
