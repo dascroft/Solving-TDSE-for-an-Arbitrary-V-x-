@@ -22,8 +22,11 @@ class TDSE(object):
         self.v_x = kwargs.get("Form",'self.k * self.x_array ** 2')
         
         self.psi = np.exp(-(self.x_array+2)**2)
-        self.LeftWallPstn = float(kwargs.get("Left wall position", '-4'))
-        self.RightWallPstn = float(kwargs.get("Right wall position", '4'))
+        self.LeftWallPstn = float(kwargs.get("Left_wall_position", '-4'))
+        self.RightWallPstn = float(kwargs.get("Right_wall_position", '4'))
+        self.BarrierWidth = float(kwargs.get("Barrier_width", '1'))
+        self.BarrierPstn = kwargs.get("Barrier_position", 'none')
+        print(self.BarrierPstn)
         
         
         if 'square' in self.v_x:
@@ -35,6 +38,15 @@ class TDSE(object):
 
         self.v_x[x<self.LeftWallPstn] = 1
         self.v_x[x>self.RightWallPstn] = 1
+        
+        print(self.BarrierPstn)
+        if self.BarrierPstn != "none":
+            self.BarrierPstn = float(self.BarrierPstn)
+            BarrierLeft = self.BarrierPstn - 0.5*self.BarrierWidth
+            BarrierRight = self.BarrierPstn + 0.5*self.BarrierWidth
+            print(BarrierRight)
+            self.v_x[(BarrierLeft<x) & (x<BarrierRight)] = 1
+        print(self.v_x)
         self.tracker = 1
 
     def solve(self, x_array, t_array):
@@ -108,6 +120,6 @@ class TDSE(object):
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
 
 
-TDSE = TDSE(Nt = "50")
+TDSE = TDSE(Barrier_position = "0", Nt = "50", Form = "square")
 TDSE.animate()
 #TDSE.plot()
