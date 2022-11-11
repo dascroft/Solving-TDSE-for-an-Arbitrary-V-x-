@@ -4,6 +4,9 @@ from findiff import FinDiff
 from scipy.sparse.linalg import inv
 from scipy.sparse import eye, diags
 import matplotlib.animation as animation
+import string
+import argparse
+from scipy import signal
 
 
 class TDSE(object):
@@ -16,10 +19,11 @@ class TDSE(object):
         self.tmin = float(kwargs.get("tmin",'0')) 
         self.tmax = float(kwargs.get("tmax",'20'))
         self.k = float(kwargs.get("k",'1'))
+        self.p = float(kwargs.get("p",'2'))
         self.x_array = np.linspace(self.xmin, self.xmax, self.Nx)
         self.t_array = np.linspace(self.tmin, self.tmax, self.Nt)
-        self.v_x = kwargs.get("Form of v(x)",'self.k * self.x_array ** 2')
-        self.psi = np.exp(-(self.x_array+2)**2)
+        self.v_x = kwargs.get("Form of v(x)",'self.k * self.x_array ** self.p')
+        self.psi = kwargs.get("psi",'np.exp(-(self.x_array+2)**2)')
 
     def solve(self, x_array, t_array):
   
@@ -45,7 +49,7 @@ class TDSE(object):
         # Iterate over each time, appending each calculation of psi to a list
         self.psi_list = []
         for t in t_array:
-            self.psi = U.dot(self.psi)
+            self.psi = U.dot(eval(self.psi))
             self.psi[0] = self.psi[-1] = 0
             self.psi_list.append(np.abs(self.psi))
         return self.psi_list
@@ -86,6 +90,24 @@ class TDSE(object):
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
 
 
-TDSE = TDSE()
-TDSE.animate()
+
+def argue():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--psi", type=str, help="A custom function, for a more complex wavefunction. Takes the function as a string.", required=False)
+    parser.add_argument("--xmin", type=int, help="The lower bound of the potential. Takes integer.", required=True)
+    parser.add_argument("--xmax", type=int, help="The upper bound of the potential. Takes integer greater than xmin.", required=True)
+    parser.add_argument("--tmin", type=int, help="The lower bound of the time. Takes integer.", required=True)
+    parser.add_argument("--tmax", type=int, help="The upper bound of the time. Takes integer greater than tmin.", required=True)
+    parser.add_argument("--k", type=int, help="Coefficient #1.", required=False)
+    parser.add_argument("--p", type=int, help="Coefficient #2.", required=False)
+    args = parser.parse_args()
+    return args
+
+if __name__ == "__main__":
+    args = argue()
+    TDSE = TDSE(psi = args.psi, xmin = args.xmin,xmax = args.xmax,tmin = args.tmin,tmax=args.tmax,k = args.k, p = args.p)
+    TDSE.animate()
+    
+
+
 #TDSE.plot()
