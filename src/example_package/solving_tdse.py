@@ -10,15 +10,15 @@ class TDSE(object):
     def __init__(self, **kwargs):
         
         self.Nx = 500
-        self.xmin = -5
-        self.xmax = 5
+        self.xmin = float(kwargs.get("xmin",'-5'))
+        self.xmax = float(kwargs.get("xmax",'5'))
         self.Nt = 250
-        self.tmin = 0
-        self.tmax = 20
-        self.k = 1
+        self.tmin = float(kwargs.get("tmin",'0')) 
+        self.tmax = float(kwargs.get("tmax",'20'))
+        self.k = float(kwargs.get("k",'1'))
         self.x_array = np.linspace(self.xmin, self.xmax, self.Nx)
         self.t_array = np.linspace(self.tmin, self.tmax, self.Nt)
-        self.v_x = self.k * self.x_array ** 2
+        self.v_x = kwargs.get("Form of v(x)",'self.k * self.x_array ** 2')
         self.psi = np.exp(-(self.x_array+2)**2)
 
     def solve(self, x_array, t_array):
@@ -28,7 +28,7 @@ class TDSE(object):
         dx = self.x_array[1] - self.x_array[0]
         
         # Convert to a diagonal matrix
-        v_x_matrix = diags(self.v_x)
+        v_x_matrix = diags(eval(self.v_x))
 
         # Calculate the Hamiltonian matrix
         H = -0.5 * FinDiff(0, dx, 2).matrix(x_array.shape) + v_x_matrix
@@ -73,7 +73,7 @@ class TDSE(object):
         
         
         ax_twin = ax.twinx()
-        ax_twin.plot(self.x_array, self.v_x, color="C1")
+        ax_twin.plot(self.x_array, eval(self.v_x), color="C1")
         ax_twin.set_ylabel("V(x) [arb units]", color="C1")
    
         self.line, = ax.plot([], [], color="C0", lw=2)
@@ -87,7 +87,5 @@ class TDSE(object):
 
 
 TDSE = TDSE()
-#TDSE.animate()
-TDSE.plot()
-
-
+TDSE.animate()
+#TDSE.plot()
