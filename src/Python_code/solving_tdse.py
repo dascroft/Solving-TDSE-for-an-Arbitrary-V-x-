@@ -12,7 +12,7 @@ class TDSE(object):
         self.Nx = 500
         self.xmin = float(kwargs.get("xmin",'-5'))
         self.xmax = float(kwargs.get("xmax",'5'))
-        self.Nt = 250
+        self.Nt = int(kwargs.get("Nt", '250'))
         self.tmin = float(kwargs.get("tmin",'0')) 
         self.tmax = float(kwargs.get("tmax",'20'))
         self.k = float(kwargs.get("k",'1'))
@@ -108,6 +108,6 @@ class TDSE(object):
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
 
 
-TDSE = TDSE()
+TDSE = TDSE(Nt = "50")
 TDSE.animate()
 #TDSE.plot()
