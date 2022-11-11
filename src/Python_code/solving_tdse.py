@@ -25,9 +25,7 @@ class TDSE(object):
         self.LeftWallPstn = float(kwargs.get("Left_wall_position", '-4'))
         self.RightWallPstn = float(kwargs.get("Right_wall_position", '4'))
         self.BarrierWidth = float(kwargs.get("Barrier_width", '1'))
-        self.BarrierPstn = kwargs.get("Barrier_position", 'none')
-        print(self.BarrierPstn)
-        
+        self.BarrierPstn = kwargs.get("Barrier_position", 'none')      
         
         if 'square' in self.v_x:
             TDSE.square(self)
@@ -39,14 +37,11 @@ class TDSE(object):
         self.v_x[x<self.LeftWallPstn] = 1
         self.v_x[x>self.RightWallPstn] = 1
         
-        print(self.BarrierPstn)
         if self.BarrierPstn != "none":
             self.BarrierPstn = float(self.BarrierPstn)
             BarrierLeft = self.BarrierPstn - 0.5*self.BarrierWidth
             BarrierRight = self.BarrierPstn + 0.5*self.BarrierWidth
-            print(BarrierRight)
             self.v_x[(BarrierLeft<x) & (x<BarrierRight)] = 1
-        print(self.v_x)
         self.tracker = 1
 
     def solve(self, x_array, t_array):
