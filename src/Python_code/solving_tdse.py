@@ -18,8 +18,24 @@ class TDSE(object):
         self.k = float(kwargs.get("k",'1'))
         self.x_array = np.linspace(self.xmin, self.xmax, self.Nx)
         self.t_array = np.linspace(self.tmin, self.tmax, self.Nt)
-        self.v_x = kwargs.get("Form of v(x)",'self.k * self.x_array ** 2')
+        self.tracker = 0
+        self.v_x = kwargs.get("Form",'self.k * self.x_array ** 2')
+        
         self.psi = np.exp(-(self.x_array+2)**2)
+        self.LeftWallPstn = float(kwargs.get("Left wall position", '-4'))
+        self.RightWallPstn = float(kwargs.get("Right wall position", '4'))
+        
+        
+        if 'square' in self.v_x:
+            TDSE.square(self)
+        
+    def square(self):
+        x = np.linspace(self.xmin, self.xmax, 500)
+        self.v_x = np.zeros(len(x))
+
+        self.v_x[x<self.LeftWallPstn] = 1
+        self.v_x[x>self.RightWallPstn] = 1
+        self.tracker = 1
 
     def solve(self, x_array, t_array):
   
@@ -28,7 +44,10 @@ class TDSE(object):
         dx = self.x_array[1] - self.x_array[0]
         
         # Convert to a diagonal matrix
-        v_x_matrix = diags(eval(self.v_x))
+        if self.tracker == 1:
+            v_x_matrix = diags(self.v_x)
+        else:
+            v_x_matrix = diags(eval(self.v_x))
 
         # Calculate the Hamiltonian matrix
         H = -0.5 * FinDiff(0, dx, 2).matrix(x_array.shape) + v_x_matrix
@@ -73,7 +92,10 @@ class TDSE(object):
         
         
         ax_twin = ax.twinx()
-        ax_twin.plot(self.x_array, eval(self.v_x), color="C1")
+        if self.tracker == 1:
+            ax_twin.plot(self.x_array, self.v_x, color="C1")
+        else:
+            ax_twin.plot(self.x_array, eval(self.v_x), color="C1")
         ax_twin.set_ylabel("V(x) [arb units]", color="C1")
    
         self.line, = ax.plot([], [], color="C0", lw=2)
