@@ -12,25 +12,32 @@ class TDSE(object):
         self.Nx = 500
         self.xmin = float(kwargs.get("xmin",'-5'))
         self.xmax = float(kwargs.get("xmax",'5'))
+        
         self.Nt = int(kwargs.get("Nt", '250'))
         self.tmin = float(kwargs.get("tmin",'0')) 
         self.tmax = float(kwargs.get("tmax",'20'))
+        
         self.k = float(kwargs.get("k",'1'))
+        
         self.x_array = np.linspace(self.xmin, self.xmax, self.Nx)
         self.t_array = np.linspace(self.tmin, self.tmax, self.Nt)
-        self.tracker = 0
-        self.v_x = kwargs.get("Form",'self.k * self.x_array ** 2')
         
+        self.v_x = kwargs.get("Form",'self.k * self.x_array ** 2')
         self.psi = np.exp(-(self.x_array+2)**2)
+        
         self.LeftWallPstn = float(kwargs.get("Left_wall_position", '-4'))
         self.RightWallPstn = float(kwargs.get("Right_wall_position", '4'))
+        self.WallHeight = kwargs.get("Wall_height", '1')
+        
         self.BarrierWidth = float(kwargs.get("Barrier_width", '1'))
         self.BarrierPstn = kwargs.get("Barrier_position", 'none')   
-        self.WallHeight = kwargs.get("Wall_height", '1')
         self.BarrierHeight = kwargs.get("Barrier_Height", '1')
-        
+
+        self.tracker = 0
+              
         if 'square' in self.v_x:
             TDSE.square(self)
+   
         
     def square(self):
         x = np.linspace(self.xmin, self.xmax, 500)
@@ -40,11 +47,13 @@ class TDSE(object):
         self.v_x[x>self.RightWallPstn] = self.WallHeight
         
         if self.BarrierPstn != "none":
-            self.BarrierPstn = float(self.BarrierPstn)
+            self.BarrierPstn = float(self.BarrierPstn)  
             BarrierLeft = self.BarrierPstn - 0.5*self.BarrierWidth
-            BarrierRight = self.BarrierPstn + 0.5*self.BarrierWidth
+            BarrierRight = self.BarrierPstn + 0.5*self.BarrierWidth           
             self.v_x[(BarrierLeft<x) & (x<BarrierRight)] = self.BarrierHeight
+            
         self.tracker = 1
+
 
     def solve(self, x_array, t_array):
   
@@ -83,40 +92,42 @@ class TDSE(object):
         return self.line,
     
     def plot(self):
-        psi_mag_squared = np.abs(TDSE.solve(self.x_array, self.t_array))**2
         fig, ax = plt.subplots(figsize=(10, 8))
-        c = ax.pcolor(self.x_array, self.t_array, psi_mag_squared, shading="auto")
         ax.set(xlabel="x [arb units]", ylabel="time [arb units]")
+        
+        psi_mag_squared = np.abs(TDSE.solve(self.x_array, self.t_array))**2  
+        c = ax.pcolor(self.x_array, self.t_array, psi_mag_squared, shading="auto")
+        
         cbar = fig.colorbar(c, ax=ax)
         cbar.set_label("$|\Psi(x, t)|^2$")
         plt.show()
         
     def animate(self):
-        fig, ax = plt.subplots()
-        
+        fig, ax = plt.subplots()       
         plt.rcParams["axes.labelsize"] = 16
         
         ax.set_xlabel("x [arb units]")
         ax.set_ylabel("$|\Psi(x, t)|$", color="C0")
-        
-        
+              
         ax_twin = ax.twinx()
         if self.tracker == 1:
             ax_twin.plot(self.x_array, self.v_x, color="C1")
         else:
             ax_twin.plot(self.x_array, eval(self.v_x), color="C1")
+            
         ax_twin.set_ylabel("V(x) [arb units]", color="C1")
    
         self.line, = ax.plot([], [], color="C0", lw=2)
         ax.grid()
-        xdata, ydata = [], []
+        #xdata, ydata = [], []
 
         ax.set_xlim(self.x_array[0], self.x_array[-1])
         ax.set_ylim(0, 1)
+        
         ani = animation.FuncAnimation(fig, self.run, TDSE.solve(self.x_array, self.t_array), interval=10)
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
 
 
-TDSE = TDSE(Barrier_position = "0", Nt = "50", Form = "square", Barrier_Height = "0.5")
+TDSE = TDSE()
 TDSE.animate()
 #TDSE.plot()
