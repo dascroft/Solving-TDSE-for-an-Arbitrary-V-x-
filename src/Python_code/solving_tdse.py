@@ -22,35 +22,35 @@ class TDSE(object):
         self.x_array = np.linspace(self.xmin, self.xmax, self.Nx)
         self.t_array = np.linspace(self.tmin, self.tmax, self.Nt)
         
-        self.v_x = kwargs.get("Form",'self.k * self.x_array ** 2')
+        self.vx = kwargs.get("Form",'self.k * self.x_array ** 2')
         self.psi = np.exp(-(self.x_array+2)**2)
         
-        self.LeftWallPstn = float(kwargs.get("Left_wall_position", '-4'))
-        self.RightWallPstn = float(kwargs.get("Right_wall_position", '4'))
-        self.WallHeight = kwargs.get("Wall_height", '1')
+        self.left_wall_pstn = float(kwargs.get("Left_wall_position", '-4'))
+        self.right_wall_pstn = float(kwargs.get("Right_wall_position", '4'))
+        self.wall_height = kwargs.get("Wall_height", '1')
         
-        self.BarrierWidth = float(kwargs.get("Barrier_width", '1'))
-        self.BarrierPstn = kwargs.get("Barrier_position", 'none')   
-        self.BarrierHeight = kwargs.get("Barrier_Height", '1')
+        self.barrier_width = float(kwargs.get("Barrier_width", '1'))
+        self.barrier_pstn = kwargs.get("Barrier_position", 'none')   
+        self.barrier_height = kwargs.get("Barrier_Height", '1')
 
         self.tracker = 0
               
-        if 'square' in self.v_x:
+        if 'square' in self.vx:
             TDSE.square(self)
    
         
     def square(self):
         x = np.linspace(self.xmin, self.xmax, 500)
-        self.v_x = np.zeros(len(x))
+        self.vx = np.zeros(len(x))
 
-        self.v_x[x<self.LeftWallPstn] = self.WallHeight
-        self.v_x[x>self.RightWallPstn] = self.WallHeight
+        self.vx[x<self.left_wall_pstn] = self.wall_height
+        self.vx[x>self.right_wall_pstn] = self.wall_height
         
-        if self.BarrierPstn != "none":
-            self.BarrierPstn = float(self.BarrierPstn)  
-            BarrierLeft = self.BarrierPstn - 0.5*self.BarrierWidth
-            BarrierRight = self.BarrierPstn + 0.5*self.BarrierWidth           
-            self.v_x[(BarrierLeft<x) & (x<BarrierRight)] = self.BarrierHeight
+        if self.barrier_pstn != "none":
+            self.barrier_pstn = float(self.barrier_pstn)  
+            barrier_left = self.barrier_pstn - 0.5*self.barrier_width
+            barrier_right = self.barrier_pstn + 0.5*self.barrier_width           
+            self.v_x[(barrier_left<x) & (x<barrier_right)] = self.barrier_height
             
         self.tracker = 1
 
@@ -63,12 +63,12 @@ class TDSE(object):
         
         # Convert to a diagonal matrix
         if self.tracker == 1:
-            v_x_matrix = diags(self.v_x)
+            vx_matrix = diags(self.vx)
         else:
-            v_x_matrix = diags(eval(self.v_x))
+            vx_matrix = diags(eval(self.vx))
 
         # Calculate the Hamiltonian matrix
-        H = -0.5 * FinDiff(0, dx, 2).matrix(x_array.shape) + v_x_matrix
+        H = -0.5 * FinDiff(0, dx, 2).matrix(x_array.shape) + vx_matrix
 
         # Apply boundary conditions to the Hamiltonian
         H[0, :] = H[-1, :] = 0
@@ -111,15 +111,14 @@ class TDSE(object):
               
         ax_twin = ax.twinx()
         if self.tracker == 1:
-            ax_twin.plot(self.x_array, self.v_x, color="C1")
+            ax_twin.plot(self.x_array, self.vx, color="C1")
         else:
-            ax_twin.plot(self.x_array, eval(self.v_x), color="C1")
+            ax_twin.plot(self.x_array, eval(self.vx), color="C1")
             
         ax_twin.set_ylabel("V(x) [arb units]", color="C1")
    
         self.line, = ax.plot([], [], color="C0", lw=2)
         ax.grid()
-        #xdata, ydata = [], []
 
         ax.set_xlim(self.x_array[0], self.x_array[-1])
         ax.set_ylim(0, 1)
@@ -129,5 +128,5 @@ class TDSE(object):
 
 
 TDSE = TDSE()
-TDSE.animate()
-#TDSE.plot()
+#TDSE.animate()
+TDSE.plot()
