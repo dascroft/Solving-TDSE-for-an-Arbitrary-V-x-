@@ -46,7 +46,7 @@ class TDSE(object):
    
         
     def square(self):
-        x = np.linspace(self.xmin, self.xmax, 500)
+        x = np.linspace(self.xmin, self.xmax, self.Nx)
         self.vx = np.zeros(len(x))  #initially sets vx to a flat line at 0 
         
         #set values in vx array to wall height for x below left position or above right position 
