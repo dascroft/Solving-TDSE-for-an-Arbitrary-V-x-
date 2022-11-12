@@ -35,7 +35,7 @@ class TDSE(object):
         
         #properties of optional central barrier for square well
         self.barrier_width = float(kwargs.get("Barrier_width", '1'))
-        self.barrier_position = kwargs.get("Barrier_position", 'none')   
+        self.barrier_position = kwargs.get("Barrier_position", 'none')  #defaults to 'none', for no barrier
         self.barrier_height = kwargs.get("Barrier_Height", '1')
 
         self.tracker = 0  #used to track use of special cases 
@@ -47,18 +47,23 @@ class TDSE(object):
         
     def square(self):
         x = np.linspace(self.xmin, self.xmax, 500)
-        self.vx = np.zeros(len(x))
-
+        self.vx = np.zeros(len(x))  #initially sets vx to a flat line at 0 
+        
+        #set values in vx array to wall height for x below left position or above right position 
         self.vx[x<self.left_wall_pstn] = self.wall_height
         self.vx[x>self.right_wall_pstn] = self.wall_height
         
-        if self.barrier_position != "none":
+        if self.barrier_position != "none":  #check if user has added barrier by changing from default
             self.barrier_position = float(self.barrier_position)  
+            
+            #calculated x coords of left and right side of barrier
             barrier_left = self.barrier_position - 0.5*self.barrier_width
-            barrier_right = self.barrier_position + 0.5*self.barrier_width           
+            barrier_right = self.barrier_position + 0.5*self.barrier_width  
+            
+            #set values of vx between the barriers left and right sides to the specified barrier height
             self.v_x[(barrier_left<x) & (x<barrier_right)] = self.barrier_height
             
-        self.tracker = 1  
+        self.tracker = 1  #used to note a special case has been used
 
 
     def solve(self, x_array, t_array):
@@ -67,7 +72,7 @@ class TDSE(object):
         dt = self.t_array[1] - self.t_array[0]
         dx = self.x_array[1] - self.x_array[0]
         
-        # Convert to a diagonal matrix
+        # Convert to a diagonal matrix, eval needs to not be used if the square well special case is used
         if self.tracker == 1:
             vx_matrix = diags(self.vx)
         else:
@@ -98,29 +103,37 @@ class TDSE(object):
         return self.line,
     
     def plot(self):
+        #creates a blank plot and adds axis labels
         fig, ax = plt.subplots(figsize=(10, 8))
         ax.set(xlabel="x [arb units]", ylabel="time [arb units]")
         
+        #calculate magnitude squared of psi
         psi_mag_squared = np.abs(TDSE.solve(self.x_array, self.t_array))**2  
-        c = ax.pcolor(self.x_array, self.t_array, psi_mag_squared, shading="auto")
+        c = ax.pcolor(self.x_array, self.t_array, psi_mag_squared, shading="auto") #create a heatmap plot of x,t,mag^2 of psi
         
+        #adds scale for the colour
         cbar = fig.colorbar(c, ax=ax)
         cbar.set_label("$|\Psi(x, t)|^2$")
+        
         plt.show()
         
     def animate(self):
+        #creates a blank plot
         fig, ax = plt.subplots()       
         plt.rcParams["axes.labelsize"] = 16
         
+        #set x label, and y label for psi
         ax.set_xlabel("x [arb units]")
         ax.set_ylabel("$|\Psi(x, t)|$", color="C0")
-              
         ax_twin = ax.twinx()
+        
+        #plot vx
         if self.tracker == 1:
             ax_twin.plot(self.x_array, self.vx, color="C1")
         else:
             ax_twin.plot(self.x_array, eval(self.vx), color="C1")
-            
+        
+        #set label for vx
         ax_twin.set_ylabel("V(x) [arb units]", color="C1")
    
         self.line, = ax.plot([], [], color="C0", lw=2)
@@ -129,10 +142,11 @@ class TDSE(object):
         ax.set_xlim(self.x_array[0], self.x_array[-1])
         ax.set_ylim(0, 1)
         
+        #animate the time evolution of psi and save as gif
         ani = animation.FuncAnimation(fig, self.run, TDSE.solve(self.x_array, self.t_array), interval=10)
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
 
 
 TDSE = TDSE()
-#TDSE.animate()
-TDSE.plot()
+TDSE.animate()
+#TDSE.plot()
