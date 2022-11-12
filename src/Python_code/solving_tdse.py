@@ -9,32 +9,38 @@ import matplotlib.animation as animation
 class TDSE(object):
     def __init__(self, **kwargs):
         
-        self.Nx = 500
+        #values determining the x-axis
         self.xmin = float(kwargs.get("xmin",'-5'))
         self.xmax = float(kwargs.get("xmax",'5'))
+        self.Nx = 500  #number of x values between xmin & xmax
         
-        self.Nt = int(kwargs.get("Nt", '250'))
+        #values determining the time range
         self.tmin = float(kwargs.get("tmin",'0')) 
         self.tmax = float(kwargs.get("tmax",'20'))
+        self.Nt = int(kwargs.get("Nt", '250'))  #number of t values between tmin & tmax
         
         self.k = float(kwargs.get("k",'1'))
         
+        #generates arrays for x & t values
         self.x_array = np.linspace(self.xmin, self.xmax, self.Nx)
         self.t_array = np.linspace(self.tmin, self.tmax, self.Nt)
         
         self.vx = kwargs.get("Form",'self.k * self.x_array ** 2')
         self.psi = np.exp(-(self.x_array+2)**2)
         
+        #properties of wall of square well        
         self.left_wall_pstn = float(kwargs.get("Left_wall_position", '-4'))
         self.right_wall_pstn = float(kwargs.get("Right_wall_position", '4'))
         self.wall_height = kwargs.get("Wall_height", '1')
         
+        #properties of optional central barrier for square well
         self.barrier_width = float(kwargs.get("Barrier_width", '1'))
-        self.barrier_pstn = kwargs.get("Barrier_position", 'none')   
+        self.barrier_position = kwargs.get("Barrier_position", 'none')   
         self.barrier_height = kwargs.get("Barrier_Height", '1')
 
-        self.tracker = 0
-              
+        self.tracker = 0  #used to track use of special cases 
+        
+        #checks if user has asked for square well, runs TDSE.square if so
         if 'square' in self.vx:
             TDSE.square(self)
    
@@ -46,13 +52,13 @@ class TDSE(object):
         self.vx[x<self.left_wall_pstn] = self.wall_height
         self.vx[x>self.right_wall_pstn] = self.wall_height
         
-        if self.barrier_pstn != "none":
-            self.barrier_pstn = float(self.barrier_pstn)  
-            barrier_left = self.barrier_pstn - 0.5*self.barrier_width
-            barrier_right = self.barrier_pstn + 0.5*self.barrier_width           
+        if self.barrier_position != "none":
+            self.barrier_position = float(self.barrier_position)  
+            barrier_left = self.barrier_position - 0.5*self.barrier_width
+            barrier_right = self.barrier_position + 0.5*self.barrier_width           
             self.v_x[(barrier_left<x) & (x<barrier_right)] = self.barrier_height
             
-        self.tracker = 1
+        self.tracker = 1  
 
 
     def solve(self, x_array, t_array):
