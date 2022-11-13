@@ -24,14 +24,20 @@ class TDSE(object):
         
         self.k = float(kwargs.get("k",'1'))
         self.p = float(kwargs.get("p",'2'))
+
         
         #generates arrays for x & t values
         self.x_array = np.linspace(self.xmin, self.xmax, self.Nx)
         self.t_array = np.linspace(self.tmin, self.tmax, self.Nt)
         
+
         self.vx = kwargs.get("vx",'self.k * self.x_array ** self.p')
         self.psi = np.exp(-(self.x_array+2)**2)
         print(self.vx)
+
+        self.vx = kwargs.get("Form",'self.k * self.x_array ** 2')
+        self.psi = np.exp(-(self.x_array+2)**2)
+        
         #properties of wall of square well        
         self.left_wall_pstn = float(kwargs.get("Left_wall_position", '-4'))
         self.right_wall_pstn = float(kwargs.get("Right_wall_position", '4'))
