@@ -34,9 +34,6 @@ class TDSE(object):
         self.vx = kwargs.get("vx",'self.k * self.x_array ** self.p')
         self.psi = np.exp(-(self.x_array+2)**2)
         print(self.vx)
-
-        self.vx = kwargs.get("Form",'self.k * self.x_array ** 2')
-        self.psi = np.exp(-(self.x_array+2)**2)
         
         #properties of wall of square well        
         self.left_wall_pstn = float(kwargs.get("Left_wall_position", '-4'))
