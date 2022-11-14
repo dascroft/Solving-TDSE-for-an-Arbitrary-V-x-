@@ -33,7 +33,6 @@ class TDSE(object):
 
         self.vx = kwargs.get("vx",'self.k * self.x_array ** self.p')
         self.psi = np.exp(-(self.x_array+2)**2)
-        print(self.vx)
         
         #properties of wall of square well        
         self.left_wall_pstn = float(kwargs.get("Left_wall_position", '-4'))
@@ -73,7 +72,7 @@ class TDSE(object):
         self.tracker = 1  #used to note a special case has been used
 
 
-    def solve(self, x_array, t_array):
+    def solve(self):
   
         # Calculate finite difference elements
         dt = self.t_array[1] - self.t_array[0]
@@ -86,7 +85,7 @@ class TDSE(object):
             vx_matrix = diags(eval(self.vx))
 
         # Calculate the Hamiltonian matrix
-        H = -0.5 * FinDiff(0, dx, 2).matrix(x_array.shape) + vx_matrix
+        H = -0.5 * FinDiff(0, dx, 2).matrix(self.x_array.shape) + vx_matrix
 
         # Apply boundary conditions to the Hamiltonian
         H[0, :] = H[-1, :] = 0
@@ -99,7 +98,7 @@ class TDSE(object):
 
         # Iterate over each time, appending each calculation of psi to a list
         self.psi_list = []
-        for t in t_array:
+        for t in self.t_array:
             self.psi = U.dot(self.psi)
             self.psi[0] = self.psi[-1] = 0
             self.psi_list.append(np.abs(self.psi))
@@ -109,13 +108,31 @@ class TDSE(object):
         self.line.set_data(self.x_array, np.abs(psi)**2)
         return self.line,
     
+    def checks(self):
+        if self.xmin >= self.xmax:
+            raise ValueError('xmax is greater than/equal to xmin')
+        
+        if self.tmin >= self.tmax:
+            raise ValueError('tmax is greater than/equal to tmin')
+        
+        if self.left_wall_pstn >= self.right_wall_pstn:
+            raise ValueError('left side of barrier is greater than/equal to right side of barrier')
+            
+        if self.wall_height < 0:
+            raise ValueError('wall height is negative')
+            
+        if self.barrier_height < 0:
+            raise ValueError('barrier height is negative')
+    
     def plot(self):
+        TDSE.checks(self)
+        
         #creates a blank plot and adds axis labels
         fig, ax = plt.subplots(figsize=(10, 8))
         ax.set(xlabel="x [arb units]", ylabel="time [arb units]")
         
         #calculate magnitude squared of psi
-        psi_mag_squared = np.abs(TDSE.solve(self.x_array, self.t_array))**2  
+        psi_mag_squared = np.abs(TDSE.solve(self))**2  
         c = ax.pcolor(self.x_array, self.t_array, psi_mag_squared, shading="auto") #create a heatmap plot of x,t,mag^2 of psi
         
         #adds scale for the colour
@@ -125,6 +142,8 @@ class TDSE(object):
         plt.show()
         
     def animate(self):
+        TDSE.checks(self)
+        
         #creates a blank plot
         fig, ax = plt.subplots()       
         plt.rcParams["axes.labelsize"] = 16
@@ -153,28 +172,5 @@ class TDSE(object):
         ani = animation.FuncAnimation(fig, self.run, TDSE.solve(self.x_array, self.t_array), interval=10)
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
 
-
-def argue():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--vx", type=str, help="A custom function, for a more complex wavefunction. Takes the function as a string.", required=False)
-    parser.add_argument("--xmin", type=int, help="The lower bound of the potential. Takes integer.", required=True)
-    parser.add_argument("--xmax", type=int, help="The upper bound of the potential. Takes integer greater than xmin.", required=True)
-    parser.add_argument("--tmin", type=int, help="The lower bound of the time. Takes integer.", required=True)
-    parser.add_argument("--tmax", type=int, help="The upper bound of the time. Takes integer greater than tmin.", required=True)
-    parser.add_argument("--k", type=int, help="Coefficient #1.", required=False)
-    parser.add_argument("--p", type=int, help="Coefficient #2.", required=False)
-    args = parser.parse_args()
-    
-    #replacing x with self.x_array
-    args.vx = args.vx.replace("x","self.x_array")
-    return args
-
-if __name__ == "__main__":
-    args = argue()
-    TDSE = TDSE(vx = args.vx, xmin = args.xmin,xmax = args.xmax,tmin = args.tmin,tmax=args.tmax,k = args.k, p = args.p)
-    TDSE.animate()
-    
-
-
-#TDSE.plot()
-#TDSE.plot()
+X=TDSE()
+X.plot()
