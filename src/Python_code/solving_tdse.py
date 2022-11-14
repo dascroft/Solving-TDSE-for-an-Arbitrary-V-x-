@@ -7,25 +7,65 @@ import matplotlib.animation as animation
 import string
 import argparse
 from scipy import signal
+import warnings
 
 
 class TDSE(object):
     def __init__(self, **kwargs):
         
-        #values determining the x-axis
-        self.xmin = float(kwargs.get("xmin",'-5'))
-        self.xmax = float(kwargs.get("xmax",'5'))
-        self.Nx = 500  #number of x values between xmin & xmax
+        try:
+            self.xmin = float(kwargs.get("xmin",'-5'))
+        except:
+            warnings.warn(f'{kwargs.get("xmin")} is not valid as xmin, using default of -5\n') 
+            self.xmin = float(-5)
+            pass
+        try:
+            self.xmax = float(kwargs.get("xmax",'5'))
+        except:
+            warnings.warn(f'{kwargs.get("xmax")} is not valid as xmax, using default of 5\n') 
+            self.xmax = float(5)
+            pass
+        try:
+            self.Nx = int(kwargs.get("Nx",'500')) #number of x values between xmin & xmax
+        except:
+            warnings.warn(f'{kwargs.get("Nx")} is not valid as Nx, using default of 500\n') 
+            self.Nx = int(500)
+            pass
         
-        #values determining the time range
-        self.tmin = float(kwargs.get("tmin",'0')) 
-        self.tmax = float(kwargs.get("tmax",'20'))
-        self.Nt = int(kwargs.get("Nt", '250'))  #number of t values between tmin & tmax
+       #values determining the time range
+        try:
+            self.tmin = float(kwargs.get("tmin",'0'))
+        except:
+            warnings.warn(f'{kwargs.get("tmin")} is not valid as tmin, using default of 0\n') 
+            self.tmin = float(0)
+            pass        
+        try:
+            self.tmax = float(kwargs.get("tmax",'20'))
+        except:
+            warnings.warn(f'{kwargs.get("tmax")} is not valid as tmax, using default of 20\n') 
+            self.tmax = float(20)
+            pass
+        try:
+            self.Nt = int(kwargs.get("Nt",'250'))#number of t values between tmin & tmax
+        except:
+            warnings.warn(f'{kwargs.get("Nt")} is not valid as Nt, using default of 25\n') 
+            self.Nt = int(250)
+            pass
         
-        self.k = float(kwargs.get("k",'1'))
-        self.p = float(kwargs.get("p",'2'))
-
+        try:
+            self.k = float(kwargs.get("k",'1'))
+        except:
+            warnings.warn(f'{kwargs.get("k")} is not valid as k, using default of k\n') 
+            self.k = float(1)
+            pass  
+        try:
+            self.p = float(kwargs.get("p",'2'))
+        except:
+            warnings.warn(f'{kwargs.get("p")} is not valid as p, using default of 2\n') 
+            self.p = float(2)
+            pass       
         
+      
         #generates arrays for x & t values
         self.x_array = np.linspace(self.xmin, self.xmax, self.Nx)
         self.t_array = np.linspace(self.tmin, self.tmax, self.Nt)
@@ -34,15 +74,44 @@ class TDSE(object):
         self.vx = kwargs.get("vx",'self.k * self.x_array ** self.p')
         self.psi = np.exp(-(self.x_array+2)**2)
         
+        
+        
+        
         #properties of wall of square well        
-        self.left_wall_pstn = float(kwargs.get("Left_wall_position", '-4'))
-        self.right_wall_pstn = float(kwargs.get("Right_wall_position", '4'))
-        self.wall_height = float(kwargs.get("Wall_height", '1'))
+        try:
+            self.left_wall_pstn = float(kwargs.get("Left_wall_position",'-4'))
+        except:
+            warnings.warn(f'{kwargs.get("Left_wall_position")} is not valid as Left_wall_position, using default of -4\n') 
+            self.left_wall_pstn = float(-4)
+            pass
+        try:
+            self.right_wall_pstn = float(kwargs.get("Right_wall_position",'4'))
+        except:
+            warnings.warn(f'{kwargs.get("Right_wall_position")} is not valid as Right_wall_position, using default of 4\n') 
+            self.right_wall_pstn = float(4)
+            pass
+        try:
+            self.wall_height = float(kwargs.get("Wall_height",'1'))
+        except:
+            warnings.warn(f'{kwargs.get("Wall_height")} is not valid as Wall_height, using default of 1\n') 
+            self.wall_height = float(1)
+            pass
+
         
         #properties of optional central barrier for square well
-        self.barrier_width = float(kwargs.get("Barrier_width", '1'))
+        try:
+            self.barrier_width = float(kwargs.get("Barrier_width",'1'))
+        except:
+            warnings.warn(f'{kwargs.get("Barrier_width")} is not valid as Barrier_width, using default of 1\n') 
+            self.barrier_width = float(1)
+            pass
+        try:
+            self.barrier_height = float(kwargs.get("Barrier_height",'1'))
+        except:
+            warnings.warn(f'{kwargs.get("Barrier_height")} is not valid as Barrier_height, using default of 1\n') 
+            self.barrier_height = float(1)
+            pass
         self.barrier_position = kwargs.get("Barrier_position", 'none')  #defaults to 'none', for no barrier
-        self.barrier_height = kwargs.get("Barrier_Height", '1')
 
         self.tracker = 0  #used to track use of special cases 
         
@@ -60,8 +129,13 @@ class TDSE(object):
         self.vx[x>self.right_wall_pstn] = self.wall_height
         
         if self.barrier_position != "none":  #check if user has added barrier by changing from default
-            self.barrier_position = float(self.barrier_position)  
-            
+            try:
+                self.barrier_position = float(self.barrier_position)  
+            except:
+                warnings.warn(f'{self.barrier_position} is not valid as Barrier_position, using default of 0\n') 
+                self.barrier_position = float(0)
+                pass
+               
             #calculated x coords of left and right side of barrier
             barrier_left = self.barrier_position - 0.5*self.barrier_width
             barrier_right = self.barrier_position + 0.5*self.barrier_width  
