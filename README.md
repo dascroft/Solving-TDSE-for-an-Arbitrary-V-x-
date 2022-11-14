@@ -5,8 +5,8 @@ Function takes user input for a potential via:
 
 *insert code here*
 
-and outputs the solution to the Hamiltonian with that potential.
-
+and outputs the solution to the Hamiltonian with that potential as a gif saved to a desired path. 
+The user can specify what function of V(x) they desire and specify the associated parameters, i.e kx^2, with parameters k being the coefficent and p being the power. Using the Crank–Nicolson method, the wavefunction is then resolved within the specified potential and the output is given as animated .gif.
 
 
 $$H = \frac{1}{2} \frac{\partial}{\partial x} + V(x)$$
