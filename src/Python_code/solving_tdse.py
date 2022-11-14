@@ -37,7 +37,7 @@ class TDSE(object):
         #properties of wall of square well        
         self.left_wall_pstn = float(kwargs.get("Left_wall_position", '-4'))
         self.right_wall_pstn = float(kwargs.get("Right_wall_position", '4'))
-        self.wall_height = kwargs.get("Wall_height", '1')
+        self.wall_height = float(kwargs.get("Wall_height", '1'))
         
         #properties of optional central barrier for square well
         self.barrier_width = float(kwargs.get("Barrier_width", '1'))
@@ -67,7 +67,7 @@ class TDSE(object):
             barrier_right = self.barrier_position + 0.5*self.barrier_width  
             
             #set values of vx between the barriers left and right sides to the specified barrier height
-            self.v_x[(barrier_left<x) & (x<barrier_right)] = self.barrier_height
+            self.vx[(barrier_left<x) & (x<barrier_right)] = float(self.barrier_height)
             
         self.tracker = 1  #used to note a special case has been used
 
@@ -120,10 +120,10 @@ class TDSE(object):
             
         if self.wall_height < 0:
             raise ValueError('wall height is negative')
-            
-        if self.barrier_height < 0:
-            raise ValueError('barrier height is negative')
-    
+        if self.tracker == 1:    
+            if float(self.barrier_height) < 0:
+                raise ValueError('barrier height is negative')
+                
     def plot(self):
         TDSE.checks(self)
         
@@ -169,8 +169,9 @@ class TDSE(object):
         ax.set_ylim(0, 1)
         
         #animate the time evolution of psi and save as gif
-        ani = animation.FuncAnimation(fig, self.run, TDSE.solve(self.x_array, self.t_array), interval=10)
+        ani = animation.FuncAnimation(fig, self.run, TDSE.solve(self), interval=10)
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
 
-X=TDSE()
-X.plot()
+tdse=TDSE()
+tdse.plot()
+tdse.animate()
