@@ -7,49 +7,33 @@ import matplotlib.animation as animation
 import string
 import argparse
 from scipy import signal
+import warnings
 
 
 class TDSE(object):
     def __init__(self, **kwargs):
         
         #values determining the x-axis
-        self.xmin = kwargs.get('xmin',-5)
-        self.xmax = kwargs.get("xmax",5)
+        self.xmin = float(kwargs.get("xmin",'-5'))
+        self.xmax = float(kwargs.get("xmax",'5'))
         self.Nx = 500  #number of x values between xmin & xmax
         
         #values determining the time range
-        self.tmin = kwargs.get("tmin",'0')
-        self.tmax = kwargs.get("tmax",'20')
+        self.tmin = float(kwargs.get("tmin",'0')) 
+        self.tmax = float(kwargs.get("tmax",'20'))
         self.Nt = int(kwargs.get("Nt", '250'))  #number of t values between tmin & tmax
         
-        self.k = kwargs.get("k",'1')
-        self.p = kwargs.get("p",'2')
+        self.k = float(kwargs.get("k",'1'))
+        self.p = float(kwargs.get("p",'2'))
 
-
-        if self.xmin == None:
-            self.xmin = -5.0
-        if self.xmax == None:
-            self.xmax = 5.0
-        if self.tmin == None:
-            self.tmin = 0
-        if self.tmax == None:
-            self.tmax = 20
-        if self.k == None:
-            self.k = 1
-        if self.p == None:
-            self.p = 2
+        
         #generates arrays for x & t values
         self.x_array = np.linspace(self.xmin, self.xmax, self.Nx)
         self.t_array = np.linspace(self.tmin, self.tmax, self.Nt)
         
 
-        self.vx = kwargs.get('vx',"self.k * self.x_array ** self.p")
+        self.vx = kwargs.get("vx",'self.k * self.x_array ** self.p')
         self.psi = np.exp(-(self.x_array+2)**2)
-        #print("===============================")
-        #print(self.vx)
-        
-        if self.vx == None:
-            self.vx = "self.k * self.x_array ** self.p"
         
         #properties of wall of square well        
         self.left_wall_pstn = float(kwargs.get("Left_wall_position", '-4'))
@@ -64,16 +48,18 @@ class TDSE(object):
         self.tracker = 0  #used to track use of special cases 
         
         #checks if user has asked for square well, runs TDSE.square if so
-        if self.vx != None and 'square' in self.vx:
+        if 'square' in self.vx:
             TDSE.square(self)
         
-        #output clause
-        self.output = kwargs.get("output", 'anim')
-        
-        if self.output == None:
-            self.output = "anim"
-        
-        #print("Out of __init__")
+        self.output = kwargs.get("Output", 'gif')
+        if self.output == "gif":
+            TDSE.animate(self)
+        elif self.output == "plot":
+            TDSE.plot(self)
+        else:
+            warnings.warn(f'{kwargs.get("Output")} is not a recognised output, using default of a gif\n')
+            TDSE.animate(self)
+   
         
     def square(self):
         x = np.linspace(self.xmin, self.xmax, self.Nx)
@@ -94,10 +80,9 @@ class TDSE(object):
             self.v_x[(barrier_left<x) & (x<barrier_right)] = self.barrier_height
             
         self.tracker = 1  #used to note a special case has been used
-        
 
 
-    def solve(self, x_array, t_array):
+    def solve(self):
   
         # Calculate finite difference elements
         dt = self.t_array[1] - self.t_array[0]
@@ -110,7 +95,7 @@ class TDSE(object):
             vx_matrix = diags(eval(self.vx))
 
         # Calculate the Hamiltonian matrix
-        H = -0.5 * FinDiff(0, dx, 2).matrix(x_array.shape) + vx_matrix
+        H = -0.5 * FinDiff(0, dx, 2).matrix(self.x_array.shape) + vx_matrix
 
         # Apply boundary conditions to the Hamiltonian
         H[0, :] = H[-1, :] = 0
@@ -123,7 +108,7 @@ class TDSE(object):
 
         # Iterate over each time, appending each calculation of psi to a list
         self.psi_list = []
-        for t in t_array:
+        for t in self.t_array:
             self.psi = U.dot(self.psi)
             self.psi[0] = self.psi[-1] = 0
             self.psi_list.append(np.abs(self.psi))
@@ -139,14 +124,14 @@ class TDSE(object):
         ax.set(xlabel="x [arb units]", ylabel="time [arb units]")
         
         #calculate magnitude squared of psi
-        psi_mag_squared = np.abs(TDSE.solve(self.x_array, self.t_array))**2  
+        psi_mag_squared = np.abs(TDSE.solve(self))**2  
         c = ax.pcolor(self.x_array, self.t_array, psi_mag_squared, shading="auto") #create a heatmap plot of x,t,mag^2 of psi
         
         #adds scale for the colour
         cbar = fig.colorbar(c, ax=ax)
         cbar.set_label("$|\Psi(x, t)|^2$")
         
-        plt.savefig("plot.png")
+        plt.show()
         
     def animate(self):
         #creates a blank plot
@@ -174,39 +159,7 @@ class TDSE(object):
         ax.set_ylim(0, 1)
         
         #animate the time evolution of psi and save as gif
-        ani = animation.FuncAnimation(fig, self.run, TDSE.solve(self.x_array, self.t_array), interval=10)
+        ani = animation.FuncAnimation(fig, self.run, TDSE.solve(self), interval=10)
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
 
-
-def argue():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--vx", type=str, help="A custom function, for a more complex wavefunction. Takes the function as a string.")
-    parser.add_argument("--xmin", type=int, help="The lower bound of the potential. Takes integer.")
-    parser.add_argument("--xmax", type=int, help="The upper bound of the potential. Takes integer greater than xmin.", required=False)
-    parser.add_argument("--tmin", type=int, help="The lower bound of the time. Takes integer.", required=False)
-    parser.add_argument("--tmax", type=int, help="The upper bound of the time. Takes integer greater than tmin.", required=False)
-    parser.add_argument("--k", type=int, help="Coefficient #1.", required=False)
-    parser.add_argument("--p", type=int, help="Coefficient #2.", required=False)
-    parser.add_argument("--output", type=str, help = "The format of the output: .GIF ('anim') or plot ('plot').")
-    args = parser.parse_args()
-    
-    #replacing x with self.x_array
-    if args.vx != None:
-        args.vx = args.vx.replace("x","self.x_array")
-    else:
-        args.vx == args.vx
-    #print(args)
-    return args
-
-if __name__ == "__main__":
-    args = argue()
-    #print(args)
-    TDSE = TDSE(vx = args.vx, xmin = args.xmin,xmax = args.xmax,tmin = args.tmin,tmax=args.tmax,k = args.k, p = args.p, output = args.output)
-    #print(TDSE.vx)
-    if TDSE.output == "anim":
-        TDSE.animate()
-    elif TDSE.output == "plot":
-        TDSE.plot()
-    else:
-        raise ValueError("The input was not a valid option. Please enter either 'anim' or 'plot'.")
-    print("")
+TDSE(Output = "ploot")
