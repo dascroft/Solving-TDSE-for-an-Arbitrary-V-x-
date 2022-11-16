@@ -4,9 +4,7 @@ from findiff import FinDiff
 from scipy.sparse.linalg import inv
 from scipy.sparse import eye, diags
 import matplotlib.animation as animation
-import string
 import argparse
-from scipy import signal
 import warnings
 
 class TDSE(object):
