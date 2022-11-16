@@ -10,13 +10,19 @@ import warnings
 class TDSE(object):
     def __init__(self, **kwargs):
         try:
-            self.xmin = float(kwargs.get("xmin",'-5'))
+            self.xmin = kwargs.get("xmin",'-5')
+            if self.xmin == None:
+                self.xmin = -5.0
+            self.xmin = float(self.xmin)
         except:
             warnings.warn(f'{kwargs.get("xmin")} is not valid as xmin, using default of -5\n') 
             self.xmin = float(-5)
             pass
         try:
-            self.xmax = float(kwargs.get("xmax",'5'))
+            self.xmax = kwargs.get("xmax",'5')
+            if self.xmax == None:
+                self.xmax = 5.0
+            self.xmax = float(self.xmax)
         except:
             warnings.warn(f'{kwargs.get("xmax")} is not valid as xmax, using default of 5\n') 
             self.xmax = float(5)
@@ -30,13 +36,20 @@ class TDSE(object):
 
        #values determining the time range
         try:
-            self.tmin = float(kwargs.get("tmin",'0'))
+            self.tmin = kwargs.get("tmin",'0')
+            if self.tmin == None:
+                self.tmin = 0
+            self.tmin = float(self.tmin)
         except:
             warnings.warn(f'{kwargs.get("tmin")} is not valid as tmin, using default of 0\n') 
             self.tmin = float(0)
+
             pass        
         try:
-            self.tmax = float(kwargs.get("tmax",'20'))
+            self.tmax = kwargs.get("tmax",'20')
+            if self.tmax == None:
+                self.tmax = 20
+            self.tmax = float(self.tmax)
         except:
             warnings.warn(f'{kwargs.get("tmax")} is not valid as tmax, using default of 20\n') 
             self.tmax = float(20)
@@ -49,30 +62,24 @@ class TDSE(object):
             pass
 
         try:
-            self.k = float(kwargs.get("k",'1'))
+            self.k = kwargs.get("k",'1')
+            if self.k == None:
+                self.k = 1
+            self.k = float(self.k)
         except:
             warnings.warn(f'{kwargs.get("k")} is not valid as k, using default of k\n') 
             self.k = float(1)
             pass  
         try:
-            self.p = float(kwargs.get("p",'2'))
+            self.p = kwargs.get("p",'2')
+            if self.p == None:
+                self.p = 2
+            self.p = float(self.p)
         except:
             warnings.warn(f'{kwargs.get("p")} is not valid as p, using default of 2\n') 
             self.p = float(2)
             pass       
 
-        if self.xmin == None:
-            self.xmin = -5.0
-        if self.xmax == None:
-            self.xmax = 5.0
-        if self.tmin == None:
-            self.tmin = 0
-        if self.tmax == None:
-            self.tmax = 20
-        if self.k == None:
-            self.k = 1
-        if self.p == None:
-            self.p = 2
         #generates arrays for x & t values
         self.x_array = np.linspace(self.xmin, self.xmax, self.Nx)
         self.t_array = np.linspace(self.tmin, self.tmax, self.Nt)
@@ -80,8 +87,6 @@ class TDSE(object):
 
         self.vx = kwargs.get('vx',"self.k * self.x_array ** self.p")
         self.psi = np.exp(-(self.x_array+2)**2)
-        #print("===============================")
-        #print(self.vx)
         
         if self.vx == None:
             self.vx = "self.k * self.x_array ** self.p"
@@ -134,6 +139,8 @@ class TDSE(object):
         
         #output clause
         self.output = kwargs.get("output", 'anim')
+        if self.output == None:
+            self.output = "anim"
         if self.output == "anim":
             TDSE.animate(self)
         elif self.output == "plot":
@@ -141,12 +148,6 @@ class TDSE(object):
         else:
             warnings.warn(f'{kwargs.get("output")} is not a recognised output, using default of a gif\n')
             TDSE.animate(self)
-        
-        if self.output == None:
-            self.output = "anim"
-        
-        
-        #print("Out of __init__")
         
     def square(self):
         x = np.linspace(self.xmin, self.xmax, self.Nx)
@@ -286,14 +287,11 @@ def argue():
         args.vx = args.vx.replace("x","self.x_array")
     else:
         args.vx == args.vx
-    #print(args)
     return args
 
 if __name__ == "__main__":
     args = argue()
-    #print(args)
     TDSE = TDSE(vx = args.vx, xmin = args.xmin,xmax = args.xmax,tmin = args.tmin,tmax=args.tmax,k = args.k, p = args.p, output = args.output)
-    #print(TDSE.vx)
     if TDSE.output == "anim":
         TDSE.animate()
     elif TDSE.output == "plot":
