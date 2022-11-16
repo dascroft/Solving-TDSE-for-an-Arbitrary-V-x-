@@ -141,13 +141,7 @@ class TDSE(object):
         self.output = kwargs.get("output", 'anim')
         if self.output == None:
             self.output = "anim"
-        if self.output == "anim":
-            TDSE.animate(self)
-        elif self.output == "plot":
-            TDSE.plot(self)
-        else:
-            warnings.warn(f'{kwargs.get("output")} is not a recognised output, using default of a gif\n')
-            TDSE.animate(self)
+
         
     def square(self):
         x = np.linspace(self.xmin, self.xmax, self.Nx)
@@ -222,14 +216,14 @@ class TDSE(object):
         return self.line,
     
     def plot(self):
-        TDSE.checks(self)
+        self.checks()
         
         #creates a blank plot and adds axis labels
         fig, ax = plt.subplots(figsize=(10, 8))
         ax.set(xlabel="x [arb units]", ylabel="time [arb units]")
         
         #calculate magnitude squared of psi
-        psi_mag_squared = np.abs(TDSE.solve(self.x_array, self.t_array))**2  
+        psi_mag_squared = np.abs(self.solve())**2  
         c = ax.pcolor(self.x_array, self.t_array, psi_mag_squared, shading="auto") #create a heatmap plot of x,t,mag^2 of psi
         
         #adds scale for the colour
@@ -297,5 +291,5 @@ if __name__ == "__main__":
     elif TDSE.output == "plot":
         TDSE.plot()
     else:
-        raise ValueError("The input was not a valid option. Please enter either 'anim' or 'plot'.")
+        warnings.warn(f'The input {args.output} is not a valid output option. Please enter either "anim" or "plot".\n')
     print("")
