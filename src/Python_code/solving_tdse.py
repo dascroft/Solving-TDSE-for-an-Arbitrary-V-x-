@@ -8,11 +8,17 @@ import string
 import argparse
 from scipy import signal
 import warnings
+<<<<<<< 28-error-messages
 
 
 class TDSE(object):
     def __init__(self, **kwargs):
         
+=======
+
+class TDSE(object):
+    def __init__(self, **kwargs):
+>>>>>>> local
         try:
             self.xmin = float(kwargs.get("xmin",'-5'))
         except:
@@ -31,7 +37,11 @@ class TDSE(object):
             warnings.warn(f'{kwargs.get("Nx")} is not valid as Nx, using default of 500\n') 
             self.Nx = int(500)
             pass
+<<<<<<< 28-error-messages
         
+=======
+
+>>>>>>> local
        #values determining the time range
         try:
             self.tmin = float(kwargs.get("tmin",'0'))
@@ -51,7 +61,11 @@ class TDSE(object):
             warnings.warn(f'{kwargs.get("Nt")} is not valid as Nt, using default of 25\n') 
             self.Nt = int(250)
             pass
+<<<<<<< 28-error-messages
         
+=======
+
+>>>>>>> local
         try:
             self.k = float(kwargs.get("k",'1'))
         except:
@@ -64,8 +78,28 @@ class TDSE(object):
             warnings.warn(f'{kwargs.get("p")} is not valid as p, using default of 2\n') 
             self.p = float(2)
             pass       
+<<<<<<< 28-error-messages
         
       
+=======
+
+
+
+
+
+        if self.xmin == None:
+            self.xmin = -5.0
+        if self.xmax == None:
+            self.xmax = 5.0
+        if self.tmin == None:
+            self.tmin = 0
+        if self.tmax == None:
+            self.tmax = 20
+        if self.k == None:
+            self.k = 1
+        if self.p == None:
+            self.p = 2
+>>>>>>> local
         #generates arrays for x & t values
         self.x_array = np.linspace(self.xmin, self.xmax, self.Nx)
         self.t_array = np.linspace(self.tmin, self.tmax, self.Nt)
@@ -96,7 +130,10 @@ class TDSE(object):
             warnings.warn(f'{kwargs.get("Wall_height")} is not valid as Wall_height, using default of 1\n') 
             self.wall_height = float(1)
             pass
+<<<<<<< 28-error-messages
 
+=======
+>>>>>>> local
         
         #properties of optional central barrier for square well
         try:
@@ -116,9 +153,35 @@ class TDSE(object):
         self.tracker = 0  #used to track use of special cases 
         
         #checks if user has asked for square well, runs TDSE.square if so
+<<<<<<< 28-error-messages
         if 'square' in self.vx:
             TDSE.square(self)
    
+=======
+        if self.vx != None and 'square' in self.vx:
+            try:
+                self.barrier_position = float(self.barrier_position)  
+            except:
+                warnings.warn(f'{self.barrier_position} is not valid as Barrier_position, using default of 0\n') 
+                self.barrier_position = float(0)
+                pass
+        
+        #output clause
+        self.output = kwargs.get("output", 'anim')
+        if self.output == "anim":
+            TDSE.animate(self)
+        elif self.output == "plot":
+            TDSE.plot(self)
+        else:
+            warnings.warn(f'{kwargs.get("output")} is not a recognised output, using default of a gif\n')
+            TDSE.animate(self)
+        
+        if self.output == None:
+            self.output = "anim"
+        
+        
+        #print("Out of __init__")
+>>>>>>> local
         
     def square(self):
         x = np.linspace(self.xmin, self.xmax, self.Nx)
@@ -144,8 +207,28 @@ class TDSE(object):
             self.vx[(barrier_left<x) & (x<barrier_right)] = float(self.barrier_height)
             
         self.tracker = 1  #used to note a special case has been used
+<<<<<<< 28-error-messages
 
 
+=======
+        
+    def checks(self):
+        if self.xmin >= self.xmax:
+            raise ValueError('xmax is greater than/equal to xmin')
+        
+        if self.tmin >= self.tmax:
+            raise ValueError('tmax is greater than/equal to tmin')
+        
+        if self.left_wall_pstn >= self.right_wall_pstn:
+            raise ValueError('left side of barrier is greater than/equal to right side of barrier')
+            
+        if self.wall_height < 0:
+            raise ValueError('wall height is negative')
+        if self.tracker == 1:    
+            if float(self.barrier_height) < 0:
+                raise ValueError('barrier height is negative')
+
+>>>>>>> local
     def solve(self):
   
         # Calculate finite difference elements
