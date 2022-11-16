@@ -7,23 +7,64 @@ import matplotlib.animation as animation
 import string
 import argparse
 from scipy import signal
-
+import warnings
 
 class TDSE(object):
     def __init__(self, **kwargs):
-        
-        #values determining the x-axis
-        self.xmin = kwargs.get('xmin',-5)
-        self.xmax = kwargs.get("xmax",5)
-        self.Nx = 500  #number of x values between xmin & xmax
-        
-        #values determining the time range
-        self.tmin = kwargs.get("tmin",'0')
-        self.tmax = kwargs.get("tmax",'20')
-        self.Nt = int(kwargs.get("Nt", '250'))  #number of t values between tmin & tmax
-        
-        self.k = kwargs.get("k",'1')
-        self.p = kwargs.get("p",'2')
+        try:
+            self.xmin = float(kwargs.get("xmin",'-5'))
+        except:
+            warnings.warn(f'{kwargs.get("xmin")} is not valid as xmin, using default of -5\n') 
+            self.xmin = float(-5)
+            pass
+        try:
+            self.xmax = float(kwargs.get("xmax",'5'))
+        except:
+            warnings.warn(f'{kwargs.get("xmax")} is not valid as xmax, using default of 5\n') 
+            self.xmax = float(5)
+            pass
+        try:
+            self.Nx = int(kwargs.get("Nx",'500')) #number of x values between xmin & xmax
+        except:
+            warnings.warn(f'{kwargs.get("Nx")} is not valid as Nx, using default of 500\n') 
+            self.Nx = int(500)
+            pass
+
+       #values determining the time range
+        try:
+            self.tmin = float(kwargs.get("tmin",'0'))
+        except:
+            warnings.warn(f'{kwargs.get("tmin")} is not valid as tmin, using default of 0\n') 
+            self.tmin = float(0)
+            pass        
+        try:
+            self.tmax = float(kwargs.get("tmax",'20'))
+        except:
+            warnings.warn(f'{kwargs.get("tmax")} is not valid as tmax, using default of 20\n') 
+            self.tmax = float(20)
+            pass
+        try:
+            self.Nt = int(kwargs.get("Nt",'250'))#number of t values between tmin & tmax
+        except:
+            warnings.warn(f'{kwargs.get("Nt")} is not valid as Nt, using default of 25\n') 
+            self.Nt = int(250)
+            pass
+
+        try:
+            self.k = float(kwargs.get("k",'1'))
+        except:
+            warnings.warn(f'{kwargs.get("k")} is not valid as k, using default of k\n') 
+            self.k = float(1)
+            pass  
+        try:
+            self.p = float(kwargs.get("p",'2'))
+        except:
+            warnings.warn(f'{kwargs.get("p")} is not valid as p, using default of 2\n') 
+            self.p = float(2)
+            pass       
+
+
+
 
 
         if self.xmin == None:
@@ -52,26 +93,64 @@ class TDSE(object):
             self.vx = "self.k * self.x_array ** self.p"
         
         #properties of wall of square well        
-        self.left_wall_pstn = float(kwargs.get("Left_wall_position", '-4'))
-        self.right_wall_pstn = float(kwargs.get("Right_wall_position", '4'))
-        self.wall_height = kwargs.get("Wall_height", '1')
+        try:
+            self.left_wall_pstn = float(kwargs.get("Left_wall_position",'-4'))
+        except:
+            warnings.warn(f'{kwargs.get("Left_wall_position")} is not valid as Left_wall_position, using default of -4\n') 
+            self.left_wall_pstn = float(-4)
+            pass
+        try:
+            self.right_wall_pstn = float(kwargs.get("Right_wall_position",'4'))
+        except:
+            warnings.warn(f'{kwargs.get("Right_wall_position")} is not valid as Right_wall_position, using default of 4\n') 
+            self.right_wall_pstn = float(4)
+            pass
+        try:
+            self.wall_height = float(kwargs.get("Wall_height",'1'))
+        except:
+            warnings.warn(f'{kwargs.get("Wall_height")} is not valid as Wall_height, using default of 1\n') 
+            self.wall_height = float(1)
+            pass
         
         #properties of optional central barrier for square well
-        self.barrier_width = float(kwargs.get("Barrier_width", '1'))
+        try:
+            self.barrier_width = float(kwargs.get("Barrier_width",'1'))
+        except:
+            warnings.warn(f'{kwargs.get("Barrier_width")} is not valid as Barrier_width, using default of 1\n') 
+            self.barrier_width = float(1)
+            pass
+        try:
+            self.barrier_height = float(kwargs.get("Barrier_height",'1'))
+        except:
+            warnings.warn(f'{kwargs.get("Barrier_height")} is not valid as Barrier_height, using default of 1\n') 
+            self.barrier_height = float(1)
+            pass
         self.barrier_position = kwargs.get("Barrier_position", 'none')  #defaults to 'none', for no barrier
-        self.barrier_height = kwargs.get("Barrier_Height", '1')
 
         self.tracker = 0  #used to track use of special cases 
         
         #checks if user has asked for square well, runs TDSE.square if so
         if self.vx != None and 'square' in self.vx:
-            TDSE.square(self)
+            try:
+                self.barrier_position = float(self.barrier_position)  
+            except:
+                warnings.warn(f'{self.barrier_position} is not valid as Barrier_position, using default of 0\n') 
+                self.barrier_position = float(0)
+                pass
         
         #output clause
         self.output = kwargs.get("output", 'anim')
+        if self.output == "anim":
+            TDSE.animate(self)
+        elif self.output == "plot":
+            TDSE.plot(self)
+        else:
+            warnings.warn(f'{kwargs.get("output")} is not a recognised output, using default of a gif\n')
+            TDSE.animate(self)
         
         if self.output == None:
             self.output = "anim"
+        
         
         #print("Out of __init__")
         
@@ -95,9 +174,23 @@ class TDSE(object):
             
         self.tracker = 1  #used to note a special case has been used
         
+    def checks(self):
+        if self.xmin >= self.xmax:
+            raise ValueError('xmax is greater than/equal to xmin')
+        
+        if self.tmin >= self.tmax:
+            raise ValueError('tmax is greater than/equal to tmin')
+        
+        if self.left_wall_pstn >= self.right_wall_pstn:
+            raise ValueError('left side of barrier is greater than/equal to right side of barrier')
+            
+        if self.wall_height < 0:
+            raise ValueError('wall height is negative')
+        if self.tracker == 1:    
+            if float(self.barrier_height) < 0:
+                raise ValueError('barrier height is negative')
 
-
-    def solve(self, x_array, t_array):
+    def solve(self):
   
         # Calculate finite difference elements
         dt = self.t_array[1] - self.t_array[0]
@@ -110,7 +203,7 @@ class TDSE(object):
             vx_matrix = diags(eval(self.vx))
 
         # Calculate the Hamiltonian matrix
-        H = -0.5 * FinDiff(0, dx, 2).matrix(x_array.shape) + vx_matrix
+        H = -0.5 * FinDiff(0, dx, 2).matrix(self.x_array.shape) + vx_matrix
 
         # Apply boundary conditions to the Hamiltonian
         H[0, :] = H[-1, :] = 0
@@ -123,7 +216,7 @@ class TDSE(object):
 
         # Iterate over each time, appending each calculation of psi to a list
         self.psi_list = []
-        for t in t_array:
+        for t in self.t_array:
             self.psi = U.dot(self.psi)
             self.psi[0] = self.psi[-1] = 0
             self.psi_list.append(np.abs(self.psi))
@@ -134,6 +227,8 @@ class TDSE(object):
         return self.line,
     
     def plot(self):
+        TDSE.checks(self)
+        
         #creates a blank plot and adds axis labels
         fig, ax = plt.subplots(figsize=(10, 8))
         ax.set(xlabel="x [arb units]", ylabel="time [arb units]")
@@ -149,6 +244,8 @@ class TDSE(object):
         plt.savefig("plot.png")
         
     def animate(self):
+        TDSE.checks(self)
+        
         #creates a blank plot
         fig, ax = plt.subplots()       
         plt.rcParams["axes.labelsize"] = 16
@@ -174,7 +271,7 @@ class TDSE(object):
         ax.set_ylim(0, 1)
         
         #animate the time evolution of psi and save as gif
-        ani = animation.FuncAnimation(fig, self.run, TDSE.solve(self.x_array, self.t_array), interval=10)
+        ani = animation.FuncAnimation(fig, self.run, TDSE.solve(self), interval=10)
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
 
 
