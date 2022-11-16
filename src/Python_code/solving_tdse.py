@@ -63,10 +63,6 @@ class TDSE(object):
             self.p = float(2)
             pass       
 
-
-
-
-
         if self.xmin == None:
             self.xmin = -5.0
         if self.xmax == None:
