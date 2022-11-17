@@ -1,7 +1,7 @@
 # Solving the TDSE for a Arbitrary Potential V
 
 Using tdse_solver.py, for a specified potention V(x), it is then solved outputting the solution to the Hamiltonian as a gif, saved to a desired path. 
-The user can specify what function of V(x) they desire and specify the associated parameters, i.e $kx^2$, with parameters $k$ being the coefficent and $p$ being the power. Using the Crank–Nicolson method, the wavefunction is then resolved within the specified potential and the default output is given as an animated 'output.gif'.
+The user can specify what function of V(x) they desire and specify the associated parameters, i.e $kx^2$, with parameters $k$ being the coefficent and $p$ being the power. Using the Crank–Nicolson method, the wavefunction is then resolved within the specified potential and the default output is given as an animated ```output.gif``` or a coloured Heat map.
 
 ### Intructions for using the program:
 Open a program capable of running `.py` files (to use command line, use Anaconda Powershell Prompt for best results.)
@@ -15,7 +15,7 @@ Open a program capable of running `.py` files (to use command line, use Anaconda
 ```python
 python tdse_cmd.py --vx "2*x**2"
 ```
-The example above generates a $V(x) = 2x^2$ potential and the TDSE is solved within this potential, The ouputted solution can be represented as either a .gif or heat map plot directed by the user.
+The example above generates a $V(x) = 2x^2$ potential and the TDSE is solved within this potential, The ouputted solution can be represented as either a .gif or heat map plot directed by the user via ```--output anim``` or ```--output plot``` respectively.
 
 ### Contents:
 
