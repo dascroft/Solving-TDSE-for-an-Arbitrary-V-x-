@@ -191,7 +191,7 @@ class TDSE(object):
             barrier_right = self.barrier_position + 0.5*self.barrier_width  
             
             #set values of vx between the barriers left and right sides to the specified barrier height
-            self.v_x[(barrier_left<x) & (x<barrier_right)] = self.barrier_height
+            self.vx[(barrier_left<x) & (x<barrier_right)] = self.barrier_height
             
         self.tracker = 1  #used to note a special case has been used
         
@@ -295,4 +295,4 @@ class TDSE(object):
         ani = animation.FuncAnimation(fig, self.run, TDSE.solve(self), interval=10)
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
 
-TDSE(vx = "square")
+TDSE(vx = "square", Barrier_position = 0)
