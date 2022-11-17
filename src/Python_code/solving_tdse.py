@@ -147,19 +147,22 @@ class TDSE(object):
             warnings.warn(f'{kwargs.get("Barrier_height")} is not valid as Barrier_height, using default of 1\n') 
             self.barrier_height = float(1)
             pass
-        self.barrier_position = kwargs.get("Barrier_position", 'none')  #defaults to 'none', for no barrier
+        
+        try:
+            self.barrier_position = kwargs.get("Barrier_position", 'None')  #defaults to 'none', for no barrier 
+        except:
+            warnings.warn(f'{self.barrier_position} is not valid as Barrier_position, using default of 0\n') 
+            self.barrier_position = None
+            pass
+        
+        
 
         self.tracker = 0  #used to track use of special cases 
         
         #checks if user has asked for square well, runs TDSE.square if so
         if self.vx != None and 'square' in self.vx:
             TDSE.square(self)
-            try:
-                self.barrier_position = float(self.barrier_position)  
-            except:
-                warnings.warn(f'{self.barrier_position} is not valid as Barrier_position, using default of 0\n') 
-                self.barrier_position = float(0)
-                pass
+            
         
         #output clause
         self.output = kwargs.get("output", 'anim')
@@ -180,7 +183,7 @@ class TDSE(object):
         self.vx[x<self.left_wall_pstn] = self.wall_height
         self.vx[x>self.right_wall_pstn] = self.wall_height
         
-        if self.barrier_position != "none":  #check if user has added barrier by changing from default
+        if self.barrier_position != "None":  #check if user has added barrier by changing from default
             self.barrier_position = float(self.barrier_position)  
             
             #calculated x coords of left and right side of barrier
