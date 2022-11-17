@@ -9,6 +9,7 @@ version = "0.0.1"
 authors = [
   { name="Alex Bradley", email="zjap019@live.rhul.ac.uk"},
   { name="Daniyal Ascroft", email="zjap013@live.rhul.ac.uk"}
+  { name="Alexander Vernis", email="zjap008@live.rhul.ac.uk"}
 ]
 description = "Solves the time dependent schrodinger equation for an arbitrary potential"
 readme = "README.md"
