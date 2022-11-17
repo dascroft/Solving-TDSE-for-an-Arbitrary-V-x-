@@ -256,7 +256,7 @@ class TDSE(object):
         plt.savefig("plot.png")
         
     def animate(self):
-        TDSE.checks(self)
+        TDSE.checks()
         
         #creates a blank plot
         fig, ax = plt.subplots()       
@@ -283,7 +283,7 @@ class TDSE(object):
         ax.set_ylim(0, 1)
         
         #animate the time evolution of psi and save as gif
-        ani = animation.FuncAnimation(fig, self.run, TDSE.solve(self), interval=10)
+        ani = animation.FuncAnimation(fig, self.run, TDSE.solve(), interval=10)
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
 
 
