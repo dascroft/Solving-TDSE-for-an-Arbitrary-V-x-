@@ -109,6 +109,8 @@ class TDSE(object):
         
 
         self.vx = kwargs.get('vx',"self.k * self.x_array ** self.p")
+        if "self.x_array" not in self.vx:
+            self.vx = self.vx.replace('x', 'self.x_array')  #replacing x with x_array
         self.psi = np.exp(-(self.x_array+2)**2)
         
         if self.vx == None:
@@ -147,23 +149,32 @@ class TDSE(object):
             warnings.warn(f'{kwargs.get("Barrier_height")} is not valid as Barrier_height, using default of 1\n') 
             self.barrier_height = float(1)
             pass
-        self.barrier_position = kwargs.get("Barrier_position", 'none')  #defaults to 'none', for no barrier
+        
+        try:
+            self.barrier_position = kwargs.get("Barrier_position", 'None')  #defaults to 'none', for no barrier 
+        except:
+            warnings.warn(f'{self.barrier_position} is not valid as Barrier_position, using default of 0\n') 
+            self.barrier_position = None
+            pass
+        
+        
 
         self.tracker = 0  #used to track use of special cases 
         
         #checks if user has asked for square well, runs TDSE.square if so
         if self.vx != None and 'square' in self.vx:
-            try:
-                self.barrier_position = float(self.barrier_position)  
-            except:
-                warnings.warn(f'{self.barrier_position} is not valid as Barrier_position, using default of 0\n') 
-                self.barrier_position = float(0)
-                pass
+            TDSE.square(self)
+            
         
         #output clause
         self.output = kwargs.get("output", 'anim')
         if self.output == None:
             self.output = "anim"
+            
+        if self.output == "anim":
+            TDSE.animate(self)
+        elif self.output == "plot":
+            TDSE.plot()
 
         
     def square(self):
@@ -174,7 +185,7 @@ class TDSE(object):
         self.vx[x<self.left_wall_pstn] = self.wall_height
         self.vx[x>self.right_wall_pstn] = self.wall_height
         
-        if self.barrier_position != "none":  #check if user has added barrier by changing from default
+        if self.barrier_position != "None":  #check if user has added barrier by changing from default
             self.barrier_position = float(self.barrier_position)  
             
             #calculated x coords of left and right side of barrier
@@ -182,7 +193,7 @@ class TDSE(object):
             barrier_right = self.barrier_position + 0.5*self.barrier_width  
             
             #set values of vx between the barriers left and right sides to the specified barrier height
-            self.v_x[(barrier_left<x) & (x<barrier_right)] = self.barrier_height
+            self.vx[(barrier_left<x) & (x<barrier_right)] = self.barrier_height
             
         self.tracker = 1  #used to note a special case has been used
         
@@ -239,7 +250,7 @@ class TDSE(object):
         return self.line,
     
     def plot(self):
-        self.checks()
+        self.checks(self)
         
         #creates a blank plot and adds axis labels
         fig, ax = plt.subplots(figsize=(10, 8))
@@ -256,7 +267,7 @@ class TDSE(object):
         plt.savefig("plot.png")
         
     def animate(self):
-        TDSE.checks()
+        TDSE.checks(self)
         
         #creates a blank plot
         fig, ax = plt.subplots()       
@@ -283,36 +294,7 @@ class TDSE(object):
         ax.set_ylim(0, 1)
         
         #animate the time evolution of psi and save as gif
-        ani = animation.FuncAnimation(fig, self.run, TDSE.solve(), interval=10)
+        ani = animation.FuncAnimation(fig, self.run, TDSE.solve(self), interval=10)
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
 
-
-def argue():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--vx", type=str, help="A custom function, for a more complex wavefunction. Takes the function as a string.")
-    parser.add_argument("--xmin", type=int, help="The lower bound of the potential. Takes integer.")
-    parser.add_argument("--xmax", type=int, help="The upper bound of the potential. Takes integer greater than xmin.", required=False)
-    parser.add_argument("--tmin", type=int, help="The lower bound of the time. Takes integer.", required=False)
-    parser.add_argument("--tmax", type=int, help="The upper bound of the time. Takes integer greater than tmin.", required=False)
-    parser.add_argument("--k", type=int, help="Coefficient #1.", required=False)
-    parser.add_argument("--p", type=int, help="Coefficient #2.", required=False)
-    parser.add_argument("--output", type=str, help = "The format of the output: .GIF ('anim') or plot ('plot').")
-    args = parser.parse_args()
-    
-    #replacing x with self.x_array
-    if args.vx != None:
-        args.vx = args.vx.replace("x","self.x_array")
-    else:
-        args.vx == args.vx
-    return args
-
-if __name__ == "__main__":
-    args = argue()
-    TDSE = TDSE(vx = args.vx, xmin = args.xmin,xmax = args.xmax,tmin = args.tmin,tmax=args.tmax,k = args.k, p = args.p, output = args.output)
-    if TDSE.output == "anim":
-        TDSE.animate()
-    elif TDSE.output == "plot":
-        TDSE.plot()
-    else:
-        warnings.warn(f'The input {args.output} is not a valid output option. Please enter either "anim" or "plot".\n')
-    print("")
+TDSE(vx = "x**8")

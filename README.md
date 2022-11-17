@@ -9,11 +9,11 @@ Open a program capable of running `.py` files (to use command line, use Anaconda
   * Open file `src\Python_code\solving_tdse.py` in the program of choice. 
   * To input values, scroll to the bottom and replace the "`args.XXX`" terms in  with the chosen values - use the contained "help" instructions above to determine which are which.
 * For command line access:
-  * From the program root folder, use `cd src\Python_code` to set the run location to the same folder as `solving_tdse.py`.
-  * Use command `python solving_tdse.py` to run the file from command line - the program should create a new `.gif` file in `src\Python_code`.
-  * To input new values, run `python solving_tdse.py --help`, to have Powershell list all possible input variables. From there, input the desired variables in standard command line format. For example: 
+  * From the program root folder, use `cd src\Python_code` to set the run location to the same folder as `tdse_cmd.py`.
+  * Use command `python tdse_cmd.py` to run the file from command line - the program should create a new `.gif` file in `src\Python_code`.
+  * To input new values, run `python tdse_cmd.py --help`, to have Powershell list all possible input variables. From there, input the desired variables in standard command line format. For example: 
 ```python
-python solving_tdse.py --vx "2*x**2"
+python tdse_cmd.py --vx "2*x**2"
 ```
 The example above generates a $V(x) = 2x^2$ potential and the TDSE is solved within this potential, The ouputted solution can be represented as either a .gif or heat map plot directed by the user.
 
