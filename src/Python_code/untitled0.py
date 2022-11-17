@@ -1,5 +1,4 @@
 import argparse
-import warnings
 import solving_tdse as tdse
 
 def argue():
@@ -26,11 +25,4 @@ if __name__ == "__main__":
     args = argue()
     kwargs_list = ['vx = ', 'xmin = ', 'xmax = ', 'tmin = ', 'tmax = ', 'k = ', 'p = ', 'output =']            
     tdse.TDSE(**vars(args))
-    #tdse.TDSE = TDSE(vx = args.vx, xmin = args.xmin,xmax = args.xmax,tmin = args.tmin,tmax=args.tmax,k = args.k, p = args.p, output = args.output)
-   # if tdse.TDSE.output == "anim":
-   #     tdse.TDSE.animate()
-   # elif tdse.TDSE.output == "plot":
-   #     tdse.TDSE.plot()
-   # else:
-  #      warnings.warn(f'The input {args.output} is not a valid output option. Please enter either "anim" or "plot".\n')
-  #  print("")
+
