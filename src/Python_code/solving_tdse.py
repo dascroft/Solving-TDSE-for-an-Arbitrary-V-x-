@@ -190,10 +190,10 @@ class TDSE(object):
             TDSE.animate(self)
         elif self.output == "plot":
             TDSE.plot(self)
-        elif self.output == "csv":
-            TDSE.csv(self)
         else:
-            warnings.warn(f'"{self.output}" is not a valid output format - please input either "anim" or "plot".\n') 
+            warnings.warn(f'"{self.output}" is not a valid output format - defaulting to "anim".\n') 
+            TDSE.animate(self)
+            
 
         
     def square(self):
