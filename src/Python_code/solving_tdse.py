@@ -6,8 +6,10 @@ from scipy.sparse import eye, diags
 import matplotlib.animation as animation
 import warnings
 
+
 class TDSE(object):
-    '''Solves the time dependant schrodinger equation, in an arbitrary potential.
+    '''
+    Solves the time dependant schrodinger equation, in an arbitrary potential.
         Parameters, potential and output can be customised with key word arguments:
         Output = "" - determines form of the output, options are "anim" for a gif, or "plot" for a 3d plot
             
@@ -31,6 +33,12 @@ class TDSE(object):
         Barrier_height = ""      - sets the height of the barrier (if present), default 1
         '''
     def __init__(self, **kwargs):
+        '''
+        Setting up variables for the program
+                
+            Raises warnings if inputs are not a valid type, and sets to default.
+            Determines which functions to use based on user input
+            '''
         try:
             self.xmin = kwargs.get("xmin",'-5')
             if self.xmin == None:
@@ -169,17 +177,19 @@ class TDSE(object):
         #output clause
         self.output = kwargs.get("output", 'anim')
         if self.output == None:
-            self.output = "anim"
-            
+            self.output = "anim"          
         if self.output == "anim":
             TDSE.animate(self)
         elif self.output == "plot":
             TDSE.plot(self)
+        elif self.output == "csv":
+            TDSE.csv(self)
         else:
             warnings.warn(f'"{self.output}" is not a valid output format - please input either "anim" or "plot".\n') 
 
         
     def square(self):
+        '''Set the potential vx to a square well of specified (or default) shape, if square well is requested'''
         x = np.linspace(self.xmin, self.xmax, self.Nx)
         self.vx = np.zeros(len(x))  #initially sets vx to a flat line at 0 
         
@@ -200,6 +210,7 @@ class TDSE(object):
         self.tracker = 1  #used to note a special case has been used
         
     def checks(self):
+        '''check that user inputs are valid'''
         if self.xmin >= self.xmax:
             raise ValueError('xmax is greater than/equal to xmin')
         
@@ -251,6 +262,7 @@ class TDSE(object):
         self.line.set_data(self.x_array, np.abs(psi)**2)
         return self.line,
     
+    
     def plot(self):
         self.checks()
         
@@ -274,6 +286,7 @@ class TDSE(object):
         #creates a blank plot
         fig, ax = plt.subplots()       
         plt.rcParams["axes.labelsize"] = 16
+
         
         #set x label, and y label for psi
         ax.set_xlabel("x [arb units]")
@@ -299,3 +312,4 @@ class TDSE(object):
         ani = animation.FuncAnimation(fig, self.run, TDSE.solve(self), interval=10)
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
 
+TDSE(output = "csv")
