@@ -8,6 +8,28 @@ import argparse
 import warnings
 
 class TDSE(object):
+    '''Solves the time dependant schrodinger equation, in an arbitrary potential.
+        Parameters, potential and output can be customised with key word arguments:
+        
+        xmin = "" - set minimum x value, default -5
+        xmax = "" - set maximum x value, default 5
+        Nx = ""   - set number of x values between xmin and xmax, default 500
+        
+        tmin = "" - set starting value for time, default 0
+        tmax = "" - set the time the program solves up to, default 20
+        Nt = ""   - set number of time values between tmin and tmax, default 250
+        
+        vx = ""   - define the potential to solve in, enter as python code using x as the variable, and "np." for numpy. 
+                    Note, to get a square well; enter 'square' for vx.  Default is x**2
+        
+        Used only for square well:
+        Left_wall_position = ""  - sets the position of the left wall of the well, default -4
+        Right_wall_position = "" - sets the position of the right wall of the well, default 4
+        Wall_height = ""         - sets the hight of the well, default 1
+        
+        Barrier_position = ""    - sets the position of the center of the barrier, default none  (defaults to no barrier)
+        Barrier_height = ""      - sets the height of the barrier (if present), default 1
+        '''
     def __init__(self, **kwargs):
         try:
             self.xmin = kwargs.get("xmin",'-5')
