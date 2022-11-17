@@ -297,4 +297,3 @@ class TDSE(object):
         ani = animation.FuncAnimation(fig, self.run, TDSE.solve(self), interval=10)
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
 
-TDSE(vx = "x**8")
