@@ -153,6 +153,7 @@ class TDSE(object):
         
         #checks if user has asked for square well, runs TDSE.square if so
         if self.vx != None and 'square' in self.vx:
+            TDSE.square(self)
             try:
                 self.barrier_position = float(self.barrier_position)  
             except:
@@ -164,6 +165,11 @@ class TDSE(object):
         self.output = kwargs.get("output", 'anim')
         if self.output == None:
             self.output = "anim"
+            
+        if self.output == "anim":
+            TDSE.animate(self)
+        elif self.output == "plot":
+            TDSE.plot()
 
         
     def square(self):
@@ -239,7 +245,7 @@ class TDSE(object):
         return self.line,
     
     def plot(self):
-        self.checks()
+        self.checks(self)
         
         #creates a blank plot and adds axis labels
         fig, ax = plt.subplots(figsize=(10, 8))
@@ -256,7 +262,7 @@ class TDSE(object):
         plt.savefig("plot.png")
         
     def animate(self):
-        TDSE.checks()
+        TDSE.checks(self)
         
         #creates a blank plot
         fig, ax = plt.subplots()       
@@ -283,36 +289,7 @@ class TDSE(object):
         ax.set_ylim(0, 1)
         
         #animate the time evolution of psi and save as gif
-        ani = animation.FuncAnimation(fig, self.run, TDSE.solve(), interval=10)
+        ani = animation.FuncAnimation(fig, self.run, TDSE.solve(self), interval=10)
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
 
-
-def argue():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--vx", type=str, help="A custom function, for a more complex wavefunction. Takes the function as a string.")
-    parser.add_argument("--xmin", type=int, help="The lower bound of the potential. Takes integer.")
-    parser.add_argument("--xmax", type=int, help="The upper bound of the potential. Takes integer greater than xmin.", required=False)
-    parser.add_argument("--tmin", type=int, help="The lower bound of the time. Takes integer.", required=False)
-    parser.add_argument("--tmax", type=int, help="The upper bound of the time. Takes integer greater than tmin.", required=False)
-    parser.add_argument("--k", type=int, help="Coefficient #1.", required=False)
-    parser.add_argument("--p", type=int, help="Coefficient #2.", required=False)
-    parser.add_argument("--output", type=str, help = "The format of the output: .GIF ('anim') or plot ('plot').")
-    args = parser.parse_args()
-    
-    #replacing x with self.x_array
-    if args.vx != None:
-        args.vx = args.vx.replace("x","self.x_array")
-    else:
-        args.vx == args.vx
-    return args
-
-if __name__ == "__main__":
-    args = argue()
-    TDSE = TDSE(vx = args.vx, xmin = args.xmin,xmax = args.xmax,tmin = args.tmin,tmax=args.tmax,k = args.k, p = args.p, output = args.output)
-    if TDSE.output == "anim":
-        TDSE.animate()
-    elif TDSE.output == "plot":
-        TDSE.plot()
-    else:
-        warnings.warn(f'The input {args.output} is not a valid output option. Please enter either "anim" or "plot".\n')
-    print("")
+TDSE(vx = "square")
