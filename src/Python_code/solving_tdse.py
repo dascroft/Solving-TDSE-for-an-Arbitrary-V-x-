@@ -10,7 +10,8 @@ import warnings
 class TDSE(object):
     '''Solves the time dependant schrodinger equation, in an arbitrary potential.
         Parameters, potential and output can be customised with key word arguments:
-        
+        Output = "" - determines form of the output, options are "anim" for a gif, or "plot" for a 3d plot
+            
         xmin = "" - set minimum x value, default -5
         xmax = "" - set maximum x value, default 5
         Nx = ""   - set number of x values between xmin and xmax, default 500
@@ -19,8 +20,8 @@ class TDSE(object):
         tmax = "" - set the time the program solves up to, default 20
         Nt = ""   - set number of time values between tmin and tmax, default 250
         
-        vx = ""   - define the potential to solve in, enter as python code using x as the variable, and "np." for numpy. 
-                    Note, to get a square well; enter 'square' for vx.  Default is x**2
+        vx = ""   - define the potential to solve in, enter as python code using x as the variable, and "np." for numpy. Default is x**2
+                    Note, to get a square well; enter 'square' for vx.  
         
         Used only for square well:
         Left_wall_position = ""  - sets the position of the left wall of the well, default -4
