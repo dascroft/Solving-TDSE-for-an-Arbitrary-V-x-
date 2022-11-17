@@ -109,6 +109,8 @@ class TDSE(object):
         
 
         self.vx = kwargs.get('vx',"self.k * self.x_array ** self.p")
+        if "self.x_array" not in self.vx:
+            self.vx = self.vx.replace('x', 'self.x_array')  #replacing x with x_array
         self.psi = np.exp(-(self.x_array+2)**2)
         
         if self.vx == None:
@@ -295,4 +297,4 @@ class TDSE(object):
         ani = animation.FuncAnimation(fig, self.run, TDSE.solve(self), interval=10)
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
 
-TDSE(vx = "square", Barrier_position = 0)
+TDSE(vx = "x**8")

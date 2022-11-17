@@ -12,13 +12,7 @@ def argue():
     parser.add_argument("--p", type=int, help="Coefficient #2.", required=False)
     parser.add_argument("--output", type=str, help = "The format of the output: .GIF ('anim') or plot ('plot').")
     args = parser.parse_args()
-    
-    
-    #replacing x with self.x_array
-    if args.vx != None:
-        args.vx = args.vx.replace("x","self.x_array")
-    else:
-        args.vx == args.vx
+
     return args
 
 if __name__ == "__main__":
