@@ -1,3 +1,23 @@
 [build-system]
 requires = ["setuptools>=42"]
 build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "Solving_tdse group c"
+version = "0.0.1"
+authors = [
+  { name="Alex Bradley", email="zjap019@live.rhul.ac.uk" },
+]
+description = "Solves the time dependent schrodinger equation for an arbitrary potential"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/dascroft/Solving-TDSE-for-an-Arbitrary-V-x-"
+"Bug Tracker" = "https://github.com/dascroft/Solving-TDSE-for-an-Arbitrary-V-x-/issues"
