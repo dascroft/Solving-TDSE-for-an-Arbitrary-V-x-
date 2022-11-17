@@ -108,12 +108,13 @@ class TDSE(object):
         
 
         self.vx = kwargs.get('vx',"self.k * self.x_array ** self.p")
+        if self.vx == None:
+            self.vx = "self.k * self.x_array ** self.p"
         if "self.x_array" not in self.vx:
             self.vx = self.vx.replace('x', 'self.x_array')  #replacing x with x_array
         self.psi = np.exp(-(self.x_array+2)**2)
         
-        if self.vx == None:
-            self.vx = "self.k * self.x_array ** self.p"
+        
         
         #properties of wall of square well        
         try:
@@ -173,7 +174,9 @@ class TDSE(object):
         if self.output == "anim":
             TDSE.animate(self)
         elif self.output == "plot":
-            TDSE.plot()
+            TDSE.plot(self)
+        else:
+            warnings.warn(f'"{self.output}" is not a valid output format - please input either "anim" or "plot".\n') 
 
         
     def square(self):
@@ -249,7 +252,7 @@ class TDSE(object):
         return self.line,
     
     def plot(self):
-        self.checks(self)
+        self.checks()
         
         #creates a blank plot and adds axis labels
         fig, ax = plt.subplots(figsize=(10, 8))
@@ -266,7 +269,7 @@ class TDSE(object):
         plt.savefig("plot.png")
         
     def animate(self):
-        TDSE.checks(self)
+        self.checks()
         
         #creates a blank plot
         fig, ax = plt.subplots()       

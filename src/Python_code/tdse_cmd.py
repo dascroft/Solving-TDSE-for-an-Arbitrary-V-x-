@@ -19,4 +19,5 @@ if __name__ == "__main__":
     args = argue()
     kwargs_list = ['vx = ', 'xmin = ', 'xmax = ', 'tmin = ', 'tmax = ', 'k = ', 'p = ', 'output =']            
     tdse.TDSE(**vars(args))
+    print("") #Leave an empty line before the next prompted input.
 
