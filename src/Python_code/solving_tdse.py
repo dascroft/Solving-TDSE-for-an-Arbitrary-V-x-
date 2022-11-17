@@ -48,6 +48,7 @@ class TDSE(object):
             warnings.warn(f'{kwargs.get("xmin")} is not valid as xmin, using default of -5\n') 
             self.xmin = float(-5)
             pass
+        
         try:
             self.xmax = kwargs.get("xmax",'5')
             if self.xmax == None:
@@ -57,6 +58,7 @@ class TDSE(object):
             warnings.warn(f'{kwargs.get("xmax")} is not valid as xmax, using default of 5\n') 
             self.xmax = float(5)
             pass
+        
         try:
             self.Nx = int(kwargs.get("Nx",'500')) #number of x values between xmin & xmax
         except:
@@ -73,8 +75,8 @@ class TDSE(object):
         except:
             warnings.warn(f'{kwargs.get("tmin")} is not valid as tmin, using default of 0\n') 
             self.tmin = float(0)
-
             pass        
+        
         try:
             self.tmax = kwargs.get("tmax",'20')
             if self.tmax == None:
@@ -84,13 +86,15 @@ class TDSE(object):
             warnings.warn(f'{kwargs.get("tmax")} is not valid as tmax, using default of 20\n') 
             self.tmax = float(20)
             pass
+        
         try:
             self.Nt = int(kwargs.get("Nt",'250'))#number of t values between tmin & tmax
         except:
             warnings.warn(f'{kwargs.get("Nt")} is not valid as Nt, using default of 25\n') 
             self.Nt = int(250)
             pass
-
+        
+        
         try:
             self.k = kwargs.get("k",'1')
             if self.k == None:
@@ -100,6 +104,7 @@ class TDSE(object):
             warnings.warn(f'{kwargs.get("k")} is not valid as k, using default of k\n') 
             self.k = float(1)
             pass  
+        
         try:
             self.p = kwargs.get("p",'2')
             if self.p == None:
@@ -131,12 +136,14 @@ class TDSE(object):
             warnings.warn(f'{kwargs.get("Left_wall_position")} is not valid as Left_wall_position, using default of -4\n') 
             self.left_wall_pstn = float(-4)
             pass
+        
         try:
             self.right_wall_pstn = float(kwargs.get("Right_wall_position",'4'))
         except:
             warnings.warn(f'{kwargs.get("Right_wall_position")} is not valid as Right_wall_position, using default of 4\n') 
             self.right_wall_pstn = float(4)
             pass
+        
         try:
             self.wall_height = float(kwargs.get("Wall_height",'1'))
         except:
@@ -151,6 +158,7 @@ class TDSE(object):
             warnings.warn(f'{kwargs.get("Barrier_width")} is not valid as Barrier_width, using default of 1\n') 
             self.barrier_width = float(1)
             pass
+        
         try:
             self.barrier_height = float(kwargs.get("Barrier_height",'1'))
         except:
@@ -177,7 +185,7 @@ class TDSE(object):
         #output clause
         self.output = kwargs.get("output", 'anim')
         if self.output == None:
-            self.output = "anim"          
+            self.output = "anim"               
         if self.output == "anim":
             TDSE.animate(self)
         elif self.output == "plot":
@@ -222,6 +230,7 @@ class TDSE(object):
             
         if self.wall_height < 0:
             raise ValueError('wall height is negative')
+            
         if self.tracker == 1:    
             if float(self.barrier_height) < 0:
                 raise ValueError('barrier height is negative')
@@ -311,5 +320,3 @@ class TDSE(object):
         #animate the time evolution of psi and save as gif
         ani = animation.FuncAnimation(fig, self.run, TDSE.solve(self), interval=10)
         ani.save("particle_in_a_well.gif", fps=120, dpi=300)
-
-TDSE(output = "csv")
