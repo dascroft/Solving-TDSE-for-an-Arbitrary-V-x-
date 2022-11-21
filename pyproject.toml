@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 
 [project]
-name = "Solving_tdse group c"
+name = "Solving_tdse_group_c"
 version = "0.0.1"
 authors = [
   { name="Alex Bradley", email="zjap019@live.rhul.ac.uk"},
